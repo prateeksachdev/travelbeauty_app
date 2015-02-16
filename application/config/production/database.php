@@ -51,8 +51,8 @@ $active_record = TRUE;
 
 ////////////default//////////////////////
 $db['default']['hostname'] = 'localhost';
-$db['default']['username'] = 'mobikasa';
-$db['default']['password'] = 'mobikasa1';
+$db['default']['username'] = 'trb_user';
+$db['default']['password'] = 'trb_mobikasa';
 $db['default']['database'] = 'app_travelbeauty';
 $db['default']['dbdriver'] = 'mysql';
 $db['default']['dbprefix'] = '';
