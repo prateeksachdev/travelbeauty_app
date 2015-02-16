@@ -50,7 +50,7 @@ $active_record = TRUE;
 
 
 ////////////default//////////////////////
-$db['default']['hostname'] = 'mobikasa.com';
+$db['default']['hostname'] = 'localhost';
 $db['default']['username'] = 'mobikasa';
 $db['default']['password'] = 'mobikasa1';
 $db['default']['database'] = 'app_travelbeauty';
