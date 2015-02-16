@@ -48,6 +48,7 @@
 //$active_group = 'default';
 $active_record = TRUE;
 
+
 ////////////default//////////////////////
 $db['default']['hostname'] = 'mobikasa.com';
 $db['default']['username'] = 'mobikasa';
