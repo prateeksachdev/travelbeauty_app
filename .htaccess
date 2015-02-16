@@ -1,6 +1,6 @@
 php_value post_max_size 400M
 RewriteEngine on
-RewriteBase /travelbeauty/
+RewriteBase /travelbeauty_app/
 # Hide the application and system directories by redirecting the request to index.php
 RewriteRule ^(application|system|\.svn) index.php/$1 [L]
 RewriteCond %{REQUEST_FILENAME} !-f
