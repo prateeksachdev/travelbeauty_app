@@ -30,7 +30,7 @@ class User extends CI_Controller {
     */
 	function validate_credentials()
 	{	
-
+die("validate");
 		$this->load->model('Users_model');
 
 		$user_name = $this->input->post('user_name');
