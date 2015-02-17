@@ -26,23 +26,12 @@ class Amazonorders extends CI_Controller {
         curl_setopt($session, CURLOPT_HEADER, false);
     }
 
-    public function test() {
-        $date = "2015-02-11 22:35:18";
-        $date = strtotime($date);
+    public function test() { 
+        set_time_limit(1500);
+        $date =$this->obj->getOrderDetails();
+        $tostring = "$date";
+        $date = strtotime($tostring)+1;
         $mysql = date("Y-m-d H:i:s", $date);
-//        echo "Store in MySql = ".$mysql;
-//        echo "<br/>output to amazon = ".date("Y-m-d\TH:i:s.\\0\\0\\0\\Z",strtotime($mysql));
-//        return;
-//        
-//      echo  $day = date('d',$date)."</br>";
-//      echo  $month = date('m',$date)."</br>";
-//      echo  $year = date('Y',$date)."</br>";
-//      echo  $hour = date('H',$date)."</br>";
-//      echo  $min = date('i',$date)."</br>";
-//      echo  $sec  = date('s',$date)."</br>";
-//        
-//         echo  $param['CreatedAfter'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z",  $date);
-//die();
         $param = array();
         $param['AWSAccessKeyId'] = $this->access_key;
         $param['Action'] = 'ListOrders';
@@ -53,24 +42,19 @@ class Amazonorders extends CI_Controller {
         $param['Timestamp'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time());
         $param['Version'] = '2011-01-01';
         $param['MarketplaceId.Id.1'] = $this->marketplace_id;
-        $param['CreatedAfter'] = date("Y-m-d\TH:i:s.\\0\\0\\0\\Z",strtotime($mysql));
-
-        $timestamp = "2010-10-05T18%3A12%3A31.687Z";
+        $param['CreatedAfter'] = date("Y-m-d\TH:i:s.\\0\\0\\0\\Z", $date);
+        $timestamp = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z");//"2010-10-05T18%3A12%3A31.687Z";
         $secret = $this->secret_key;
         $operation = "AWSECommerceService";
         $url = array();
         Ksort($param);
         foreach ($param as $key => $val) {
-
-            $key = str_replace("%7E", "~", rawurlencode($key));
+      $key = str_replace("%7E", "~", rawurlencode($key));
             $val = str_replace("%7E", "~", rawurlencode($val));
             $url[] = "{$key}={$val}";
         }
-        
         sort($url);
-       
         $arr = implode('&', $url);
-
         $sign = 'GET' . "\n";
         $sign .= 'mws.amazonservices.com' . "\n";
         $sign .= '/Orders/2015-01-28' . "\n";
@@ -80,7 +64,6 @@ class Amazonorders extends CI_Controller {
         //  $signature = $this->createSignature($param['Signature'],$timestamp,$secret);
 
         $link = "https://mws.amazonservices.com/Orders/2015-01-28?";
-        // $link .= $arr;
         $link .= $arr . "&Signature=" . $signature;
 
         $ch = curl_init($link);
@@ -91,25 +74,28 @@ class Amazonorders extends CI_Controller {
 
         $info = curl_getinfo($ch);
         curl_close($ch);
-
         $xml = simplexml_load_string($response);
         $xml_array = unserialize(serialize(json_decode(json_encode((array) $xml), 1)));
         $orders = $xml_array['ListOrdersResult']['Orders']['Order'];
-     
-
-        foreach ($orders as $key => $order) { 
-			if($order['OrderStatus'] != "Canceled"){   
+        if(isset($orders[0])){
+            $ordersarray = $orders;
+        }else{
+             $ordersarray[0] = $orders;
+        }
+        foreach ($ordersarray as $key => $order) { 
+            $lastInsertedId =  $this->obj->dumpAmazonOrderDetails(json_encode($ordersarray[$key]));
+            if($order['OrderStatus'] == "Unshipped" || $order['OrderStatus'] == "Shipped"){  
                         $this->obj->saveOrderDetails($order);
-			$orders[$key][$order['AmazonOrderId']] = $this->detailorder($order['AmazonOrderId']); 
-			
-//			  $this->shopifyAddOrders($orders[$key]);
+                        $ordersarray[$key][$order['AmazonOrderId']] = $this->detailorder($order['AmazonOrderId']); 
+                        
+			$this->shopifyAddOrders($ordersarray[$key],$lastInsertedId);
 			}
         }
 		echo "<pre>";
-        print_r($orders);
+        print_r($ordersarray);
     }
   
-            function createSignature($operation, $timestamp, $secret) {
+    function createSignature($operation, $timestamp, $secret) {
         $the_string = $operation . $timestamp;
         return base64_encode(hash_hmac("sha256", $the_string, $secret, true));
     }
@@ -170,14 +156,10 @@ class Amazonorders extends CI_Controller {
 
         $xml = simplexml_load_string($response);
         $xml_array = unserialize(serialize(json_decode(json_encode((array) $xml), 1)));
-	//	print_r($xml_array);
-	//	die("ddd");
         return $xml_array;
     }
 
-    public function shopifyAddOrders($orderDetails) {
-		
-
+    public function shopifyAddOrders($orderDetails,$lastInsertedId) {
         if (!isset($orderDetails[$orderDetails['AmazonOrderId']]['ListOrderItemsResult']['OrderItems']['OrderItem']['OrderItemId'])) {
             $orderCustom = $orderDetails[$orderDetails['AmazonOrderId']]['ListOrderItemsResult']['OrderItems']['OrderItem'];
             $itemcount = count($orderCustom);
@@ -187,11 +169,11 @@ class Amazonorders extends CI_Controller {
             $itemcount = 1;
         }
        
-        $API_KEY = "d68564b222657cb012f2e8c19c91b38e";
-        $SECRET = "97252c5d0a7178538c5abaae6f909ce7";
-        $STORE_URL = "surprisepost.myshopify.com";
+        $API_KEY = $this->config->item('shopify_api_key');
+        $SECRET = $this->config->item('shopify_secret_key');
+        $STORE_URL = $this->config->item('shopify_store_url');
         $url = 'https://' . $API_KEY . ':' . $SECRET . '@' . $STORE_URL . '/admin/orders.json';
-
+        
         for ($i = 0; $i < $itemcount; $i++) {
          
             $country_code = $this->obj->getCountryCode($orderDetails['ShippingAddress']['CountryCode']);
@@ -200,7 +182,7 @@ class Amazonorders extends CI_Controller {
 //                $shopify_sku_code = "11111";
 //            }
            
-		   
+            if($shopify_prd_details){
 		 
             $price = $orderCustom[$i]['ItemTax']['Amount'] +
                     $orderCustom[$i]['ItemPrice']['Amount'];
@@ -267,6 +249,9 @@ class Amazonorders extends CI_Controller {
             curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($session, CURLOPT_SSL_VERIFYPEER, false);
             $jsondata = curl_exec($session);
+            if($jsondata){
+            $this->obj->dumpShopifyOrderDetails($jsondata,$lastInsertedId);
+            }
             $info = curl_getinfo($session);
           
             curl_close($session);
@@ -277,8 +262,9 @@ class Amazonorders extends CI_Controller {
             $jsondata = str_replace("\r", "", $jsondata);
             $obj = json_decode($jsondata, true);
             $output['response'] = $jsondata;
-			
-         
+            
+            echo $lastInsertedId;
+            }
         }
     }
  public function randomAlphaString($length = 7) {
