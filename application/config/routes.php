@@ -39,7 +39,7 @@
 */
 
 
-$route['default_controller'] = 'user/index';
+$route['default_controller'] = 'user';
 $route['404_override'] = '';
 
 /*admin*/
