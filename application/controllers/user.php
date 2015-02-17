@@ -30,14 +30,13 @@ class User extends CI_Controller {
     */
 	function validate_credentials()
 	{	
-die("validate");
+
 		$this->load->model('Users_model');
 
 		$user_name = $this->input->post('user_name');
 		$password = $this->__encrip_password($this->input->post('password'));
-
-		echo $is_valid = $this->Users_model->validate($user_name, $password);
-		die("yes");
+		 $is_valid = $this->Users_model->validate($user_name, $password);
+		
 		if($is_valid)
 		{
 			$data = array(
