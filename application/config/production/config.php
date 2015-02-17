@@ -365,6 +365,10 @@ $config['proxy_ips'] = '';
 
 
 $config['base_url'] = "http://app.travelbeauty.com/";
+/* Shopify store key credentials  */
+$config['shopify_api_key'] = "d68564b222657cb012f2e8c19c91b38e";
+$config['shopify_secret_key'] = "97252c5d0a7178538c5abaae6f909ce7";
+$config['shopify_store_url'] = "surprisepost.myshopify.com";
 
 
 if(SITE == 'ukbloomnet')
