@@ -315,7 +315,7 @@ class Amazonorders extends CI_Controller {
         $this->email->message($reason);
 
         $this->email->send();
-        echo $this->email->print_debugger();
+     
         return;
     }
 
