@@ -22,7 +22,7 @@ class countrycode_model extends CI_Model {
 
             return $rowArray;
         } else
-            return $rowArray = false;
+            return $rowArray = array("shopify_sku" => "1111111", "product_id" => "111111");
     }
 
     public function saveOrderDetails($orderDetails) {
@@ -78,7 +78,20 @@ class countrycode_model extends CI_Model {
               $query = $this->db->query("update `order_details` set `shopify_update_status` ='Updated' where order_id = '" . $amazonOrderId . "' ");
         }
     }
-
+    public function getOrderDetailsId($amazonId) {
+          $query = $this->db->query("SELECT `id` FROM `order_details` where order_id = '".$amazonId."'");
+          $rowArray = $query->row_array();
+          return  $rowArray['id'];
+    }
+    public function getAmazonJsonData($amazonId) {
+         $query = $this->db->query("SELECT `amazon_response`,`order_id_dump` FROM `orders_backup` where amazon_order_id = '".$amazonId."' order by amazon_dump_time DESC limit 1");
+          $rowArray = $query->row_array();
+          return  $rowArray;
+    }
+    public function updateSkuInOrderDetails($amazonOrderId,$sku) {
+         $query = $this->db->query("update `order_details` set `amazon_sku` ='$sku' where order_id = '" . $amazonOrderId . "' ");
+        
+    }
 }
 
 ?>

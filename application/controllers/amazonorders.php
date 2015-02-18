@@ -85,11 +85,12 @@ class Amazonorders extends CI_Controller {
             } else {
                 $ordersarray[0] = $orders;
             }
+          
             foreach ($ordersarray as $key => $order) {
                 $lastInsertedId = $this->obj->dumpAmazonOrderDetails(json_encode($ordersarray[$key]), $ordersarray[$key]);
-                if ($order['OrderStatus'] == "Unshipped") {
+                if ($order['OrderStatus'] == "Unshipped" || $order['OrderStatus'] == "Shipped") {
                     $this->obj->saveOrderDetails($order);
-                    $ordersarray[$key][$order['AmazonOrderId']] = $this->detailorder($order['AmazonOrderId']);
+                    $ordersarray[$key][$order['AmazonOrderId']] = $this->detailorder($order['AmazonOrderId'],$lastInsertedId);
                     if ($ordersarray[$key][$order['AmazonOrderId']]) {
                         $this->obj->dumpOrderIdData($lastInsertedId, json_encode($ordersarray[$key][$order['AmazonOrderId']]));
                     }
@@ -109,7 +110,7 @@ class Amazonorders extends CI_Controller {
         return base64_encode(hash_hmac("sha256", $the_string, $secret, true));
     }
 
-    public function detailorder($id) {
+    public function detailorder($id,$lastInsertedId) {
 
         $param = array();
         $param['AWSAccessKeyId'] = $this->access_key;
@@ -165,6 +166,10 @@ class Amazonorders extends CI_Controller {
 
         $xml = simplexml_load_string($response);
         $xml_array = unserialize(serialize(json_decode(json_encode((array) $xml), 1)));
+        if($xml_array){
+            $sku = $xml_array['ListOrderItemsResult']['OrderItems']['OrderItem']['SellerSKU'];
+            $this->obj->updateSkuInOrderDetails($id,$sku);
+        }
         return $xml_array;
     }
 
@@ -263,7 +268,7 @@ class Amazonorders extends CI_Controller {
 
                 curl_close($session);
 
-
+                
 
                 $jsondata = str_replace("\n", "", $jsondata);
                 $jsondata = str_replace("\r", "", $jsondata);
@@ -312,11 +317,27 @@ class Amazonorders extends CI_Controller {
 //        $this->email->bcc('them@their-example.com'); 
 
         $this->email->subject($subject);
-        $this->email->message($reason);
+        $this->email->message('There was some error while fatching the amazon orders and placing them on shopify, Please have a look.');
 
         $this->email->send();
-     
+        echo $this->email->print_debugger();
         return;
+    }
+    
+    public function createShopifyOrder(){
+        $amazonId = $_GET['id'];
+        $id = $this->obj->getOrderDetailsId($amazonId);
+       
+        $orderDetails = $this->obj->getAmazonJsonData($amazonId);
+        if($orderDetails){
+           $order_details =  json_decode(str_replace("\'","'", $orderDetails['amazon_response']),true); 
+          
+           $order_amazon_details =  json_decode(str_replace("\'","'", $orderDetails['order_id_dump']),true);
+           $order_details[$order_details['AmazonOrderId']] = $order_amazon_details;
+        }
+      
+        $this->shopifyAddOrders($order_details,$id);
+       
     }
 
 }
