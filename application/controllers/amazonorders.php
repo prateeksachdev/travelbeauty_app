@@ -82,16 +82,16 @@ class Amazonorders extends CI_Controller {
         }else{
              $ordersarray[0] = $orders;
         }
-        foreach ($ordersarray as $key => $order) { 
-            $lastInsertedId =  $this->obj->dumpAmazonOrderDetails(json_encode($ordersarray[$key]),$ordersarray[$key]);
-            if($order['OrderStatus'] == "Unshipped"){  
-                        $this->obj->saveOrderDetails($order);
-                        $ordersarray[$key][$order['AmazonOrderId']] = $this->detailorder($order['AmazonOrderId']); 
-                        if($ordersarray[$key][$order['AmazonOrderId']]){ 
-                        $this->obj->dumpOrderIdData($lastInsertedId,json_encode($ordersarray[$key][$order['AmazonOrderId']]));    
-                        }
-			$this->shopifyAddOrders($ordersarray[$key],$lastInsertedId);
-			}
+		foreach ($ordersarray as $key => $order) {
+                $lastInsertedId = $this->obj->dumpAmazonOrderDetails(json_encode($ordersarray[$key]), $ordersarray[$key]);
+                if ($order['OrderStatus'] == "Unshipped") {
+                    $this->obj->saveOrderDetails($order);
+                    $ordersarray[$key][$order['AmazonOrderId']] = $this->detailorder($order['AmazonOrderId']);
+                    if ($ordersarray[$key][$order['AmazonOrderId']]) {
+                        $this->obj->dumpOrderIdData($lastInsertedId, json_encode($ordersarray[$key][$order['AmazonOrderId']]));
+                    }
+                    $this->shopifyAddOrders($ordersarray[$key], $lastInsertedId);
+                }
         }
 		echo "<pre>";
         print_r($ordersarray);
@@ -264,12 +264,14 @@ class Amazonorders extends CI_Controller {
             $jsondata = str_replace("\r", "", $jsondata);
             $obj = json_decode($jsondata, true);
             $output['response'] = $jsondata;
-            
-            echo $lastInsertedId;
+             if(!isset($obj['errors'])){
+                 $this->obj->updateOrderDetails($orderDetails['AmazonOrderId']);
+                }
+           
             }
         }
     }
- public function randomAlphaString($length = 7) {
+	public function randomAlphaString($length = 7) {
         $key = '';
         $keys = array_merge(range(0, 9), range('a', 'z'));
 
@@ -278,5 +280,31 @@ class Amazonorders extends CI_Controller {
         }
 
         return $key;
+    }
+	
+    public function notifybyemail($subject, $reason = "") {
+      
+        $config = Array(
+            'protocol' => 'smtp',
+            'smtp_host' => 'smtp.mandrillapp.com',
+            'smtp_port' => 587,
+            'smtp_user' => 'ankushmadaan@mobikasa.com',
+            'smtp_pass' => 'XJXm1e33BIZoj21utYNPgQ',
+            'mailtype' => 'html'
+        );
+        $this->load->library('email', $config);
+        //$this->email->set_newline("\r\n");
+        // Set to, from, message, etc.
+        $this->email->from('ankushmadaan@mobikasa.com', 'Travel Beauty');
+        $this->email->to('ankushmadaan@mobikasa.com');
+        $this->email->cc('ankit@mobikasa.com'); 
+//        $this->email->bcc('them@their-example.com'); 
+
+        $this->email->subject('Travel Beauty Error');
+        $this->email->message('There was some error while fatching the amazon orders and placing them on shopify, Please have a look.');
+
+        $this->email->send();
+        echo $this->email->print_debugger();
+        return;
     }
 }

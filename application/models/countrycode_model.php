@@ -33,11 +33,11 @@ class countrycode_model extends CI_Model {
        
             if ($rowCount['count'] > 0) {
                 $date = str_replace(array('T', 'Z'), ' ', $orderDetails['PurchaseDate']);
-                $query = $this->db->query("update `order_details` set `purchase_date` ='" . $date . "'where order_id = '" . $orderDetails['AmazonOrderId'] . "'");
+                $query = $this->db->query("update `order_details` set `purchase_date` ='" . $date . "',`amazon_order_status` ='" . $orderDetails['OrderStatus'] . "' where order_id = '" . $orderDetails['AmazonOrderId'] . "'");
             } else {
                 $date = str_replace(array('T', 'Z'), ' ', $orderDetails['PurchaseDate']);
 
-                $query = $this->db->query("Insert into order_details(purchase_date,order_id) values ('" . $date . "','" . $orderDetails['AmazonOrderId'] . "')");
+                $query = $this->db->query("Insert into order_details(purchase_date,order_id,amazon_order_status) values ('" . $date . "','" . $orderDetails['AmazonOrderId'] . "','" . $orderDetails['OrderStatus'] . "')");
             }
         }
     }
@@ -72,6 +72,11 @@ class countrycode_model extends CI_Model {
           $date = date("Y-m-d H:i:s");
          $query = $this->db->query("update `orders_backup` set `shopify_response` ='" . $orderJson . "', `shopify_dump_time` ='" . $date . "' where id = '" . $id . "'");
         
+    }
+    public function updateOrderDetails($amazonOrderId) {
+        if($amazonOrderId){
+              $query = $this->db->query("update `order_details` set `shopify_update_status` ='Updated' where order_id = '" . $amazonOrderId . "' ");
+        }
     }
 
 }
