@@ -173,23 +173,30 @@ class Admin_products extends CI_Controller {
             $this->form_validation->set_error_delimiters('<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a><strong>', '</strong></div>');
 
             //if the form has passed through the validation
-            if ($this->form_validation->run())
-            {
+            if($this->form_validation->run() == FALSE)
+		{
+			$data['flash_message'] = FALSE; 
+		}
+          else
+		   {			
+			$this->load->model('products_model');
+
                 $data_to_store = array(
                     'amazon_sku' => $this->input->post('amazon_sku'),
                     'shopify_sku' => $this->input->post('shopify_sku'),
                     'product_id' => $this->input->post('product_id'),          
                     'manufacture_id' => $this->input->post('manufacture_id')
                 );
-                //if the insert has returned true then we show the flash message
-                if($this->products_model->store_product($data_to_store)){
-                    $data['flash_message'] = TRUE; 
-                }else{
-                    $data['flash_message'] = FALSE; 
-                }
-
-            }
-
+			
+			if($this->products_model->store_product($data_to_store))
+			{
+				 $data['flash_message'] = TRUE; 		
+			}
+			else
+			{
+				 $data['flash_message'] = FALSE; 		
+			}
+		   }
         }
         //fetch manufactures data to populate the select field
         $data['manufactures'] = $this->manufacturers_model->get_manufacturers();
@@ -221,7 +228,6 @@ class Admin_products extends CI_Controller {
     
                 $data_to_store = array(
                     'amazon_sku' => $this->input->post('amazon_sku'),
-                    'stock' => $this->input->post('stock'),
                     'shopify_sku' => $this->input->post('shopify_sku'),
                     'product_id' => $this->input->post('product_id'),          
                     'manufacture_id' => $this->input->post('manufacture_id')

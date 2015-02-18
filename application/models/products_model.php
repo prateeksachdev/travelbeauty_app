@@ -25,7 +25,7 @@ class Products_model extends CI_Model {
     }
 
     /**
-    * Fetch products data from the database
+    * Fetch amazon_sku_match data from the database
     * possibility to mix search, filter and order
     * @param int $manufacuture_id 
     * @param string $search_string 
@@ -42,7 +42,7 @@ class Products_model extends CI_Model {
 		$this->db->select('amazon_sku_match.amazon_sku');
 		$this->db->select('amazon_sku_match.shopify_sku');
 		$this->db->select('amazon_sku_match.product_id');
-		//$this->db->select('amazon_sku_match.manufacture_id');
+		//$this->db->select('products.manufacture_id');
 		//$this->db->select('manufacturers.name as manufacture_name');
 		$this->db->from('amazon_sku_match');
 		if($manufacture_id != null && $manufacture_id != 0){
@@ -105,8 +105,17 @@ class Products_model extends CI_Model {
     */
     function store_product($data)
     {
-		$insert = $this->db->insert('amazon_sku_match', $data);
-	    return $insert;
+        $this->db->where('amazon_sku', $this->input->post('amazon_sku'));
+		$query = $this->db->get('amazon_sku_match');
+
+        if($query->num_rows > 0){
+        	echo '<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a><strong>';
+			  echo "Amazon Sku Should be Unique";	
+			echo '</strong></div>';
+		}else{
+            $insert = $this->db->insert('amazon_sku_match', $data);
+		    return $insert;
+		}
 	}
 
     /**
