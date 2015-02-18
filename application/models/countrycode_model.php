@@ -53,14 +53,21 @@ class countrycode_model extends CI_Model {
         }
         return $rowArray['purchase_date'];
     }
-    public function dumpAmazonOrderDetails($orderJson){
+    public function dumpAmazonOrderDetails($orderJson,$orderDetails){
         $date = date("Y-m-d H:i:s");
-       $orderJson =  str_replace("'", "\'", $orderJson);
-         $query = $this->db->query("Insert into orders_backup(amazon_response,amazon_dump_time) values ('" . $orderJson . "','" . $date . "')");
+        $orderJson =  str_replace("'", "\'", $orderJson);
+         $query = $this->db->query("Insert into orders_backup(amazon_response,amazon_order_id,amazon_dump_time) values ('" . $orderJson . "','" . $orderDetails['AmazonOrderId'] . "','" . $date . "')");
          $id = mysql_insert_id();
          return $id;
     }
-     public function dumpShopifyOrderDetails($orderJson,$id){
+    public function dumpOrderIdData($lastInsertedId,$orderIdData){
+       
+        $orderJson =  str_replace("'", "\'", $orderIdData);
+          $query = $this->db->query("update `orders_backup` set `order_id_dump` ='" . $orderJson . "' where id = '" . $lastInsertedId . "'");
+        
+    }
+
+    public function dumpShopifyOrderDetails($orderJson,$id){
           $orderJson =  str_replace("'", "\'", $orderJson);
           $date = date("Y-m-d H:i:s");
          $query = $this->db->query("update `orders_backup` set `shopify_response` ='" . $orderJson . "', `shopify_dump_time` ='" . $date . "' where id = '" . $id . "'");

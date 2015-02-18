@@ -83,11 +83,13 @@ class Amazonorders extends CI_Controller {
              $ordersarray[0] = $orders;
         }
         foreach ($ordersarray as $key => $order) { 
-            $lastInsertedId =  $this->obj->dumpAmazonOrderDetails(json_encode($ordersarray[$key]));
-            if($order['OrderStatus'] == "Unshipped" || $order['OrderStatus'] == "Shipped"){  
+            $lastInsertedId =  $this->obj->dumpAmazonOrderDetails(json_encode($ordersarray[$key]),$ordersarray[$key]);
+            if($order['OrderStatus'] == "Unshipped"){  
                         $this->obj->saveOrderDetails($order);
                         $ordersarray[$key][$order['AmazonOrderId']] = $this->detailorder($order['AmazonOrderId']); 
-                        
+                        if($ordersarray[$key][$order['AmazonOrderId']]){ 
+                        $this->obj->dumpOrderIdData($lastInsertedId,json_encode($ordersarray[$key][$order['AmazonOrderId']]));    
+                        }
 			$this->shopifyAddOrders($ordersarray[$key],$lastInsertedId);
 			}
         }
