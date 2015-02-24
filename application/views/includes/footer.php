@@ -1,4 +1,7 @@
-	<div id="footer">
+</div>
+    <!-- /#wrapper -->
+
+	<div id="footer" style="">
 		<hr>
 		<div class="inner">
 			<div class="container">
@@ -11,5 +14,11 @@
 	<script src="<?php echo base_url(); ?>assets/js/jquery-1.7.1.min.js"></script>
 	<script src="<?php echo base_url(); ?>assets/js/bootstrap.min.js"></script>
 	<script src="<?php echo base_url(); ?>assets/js/admin.min.js"></script>
+	 <script>
+    $(".nav a").on("click", function(){
+   $(".nav").find(".active").removeClass("active");
+   $(this).parent().addClass("active");
+});
+    </script>
 </body>
 </html>

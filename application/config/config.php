@@ -363,4 +363,16 @@ $config['proxy_ips'] = '';
 /* End of file config.php */
 /* Location: ./application/config/config.php */
 
+//$config['base_url'] = "http://localhost/travelbeauty_app/";
 $config['base_url'] = "http://localhost/travelbeauty/";
+
+/* Amazon Access keys */
+$config['seller_id'] = "A2THW3MTISTUM9";
+$config['marketplace_id'] = "ATVPDKIKX0DER";
+$config['access_key'] = "AKIAIZVO6ZPOMHLXN7UA";
+$config['secret_key'] = "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";
+
+
+$config['shopify_api_key'] = "d68564b222657cb012f2e8c19c91b38e";
+$config['shopify_secret_key'] = "97252c5d0a7178538c5abaae6f909ce7";
+$config['shopify_store_url'] = "surprisepost.myshopify.com";

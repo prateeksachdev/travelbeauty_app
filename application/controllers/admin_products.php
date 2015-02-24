@@ -159,7 +159,7 @@ class Admin_products extends CI_Controller {
         $this->load->view('includes/template', $data);  
 
     }//index
-
+    
     public function add()
     {
         //if save button was clicked, get the data sent via post
@@ -168,7 +168,7 @@ class Admin_products extends CI_Controller {
 
             //form validation
             $this->form_validation->set_rules('amazon_sku', 'amazon_sku', 'required');
-            $this->form_validation->set_rules('shopify_sku', 'shopify_sku', 'required|numeric');
+            $this->form_validation->set_rules('shopify_sku', 'shopify_sku', 'required');
             $this->form_validation->set_rules('product_id', 'product_id', 'required|numeric');
             $this->form_validation->set_error_delimiters('<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a><strong>', '</strong></div>');
 

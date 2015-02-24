@@ -1,4 +1,4 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+	<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 /*
 | -------------------------------------------------------------------------
 | URI ROUTING
@@ -63,6 +63,8 @@ $route['admin/manufacturers/update'] = 'admin_manufacturers/update';
 $route['admin/manufacturers/update/(:any)'] = 'admin_manufacturers/update/$1';
 $route['admin/manufacturers/delete/(:any)'] = 'admin_manufacturers/delete/$1';
 $route['admin/manufacturers/(:any)'] = 'admin_manufacturers/index/$1'; //$1 = page number
+$route['admin/orders']='admin_orders/index';
+$route['admin/orders/(:any)'] = 'admin_orders/index/$1'; //$1 = page number
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */
