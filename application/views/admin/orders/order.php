@@ -93,6 +93,7 @@ height: 26px;"');
               <?php
               foreach($products as $row)
               {  if($row['shopify_order_id'] !=0) $row['shopify_order_id'] = $row['shopify_order_id']; else $row['shopify_order_id'] = "-";
+              $currentPage = isset($currentPage) ? $currentPage : 1;
                 echo '<tr>';
                
                 echo '<td>'.$row['order_id'].'</td>';
@@ -102,7 +103,7 @@ height: 26px;"');
                 $line = '<td class="crud-actions">';
                   if (($row['shopify_order_id'] == 0)&& $row['amazon_order_status'] == "Unshipped")
                 {
-               $line .='<a href='. $this->config->item('base_url') .'amazonorders/createShopifyOrder?id='.$row['order_id'].'&page='. $currentPage .'" class="btn btn-info">REPROCESS</a>'; 
+               $line .='<a href='. $this->config->item('base_url') .'amazonorders/createShopifyOrder?id='.$row['order_id'].'&page='. $currentPage .' class="btn btn-info">REPROCESS</a>'; 
                
                 }
                 echo $line;

@@ -40,8 +40,8 @@ class Admin_orders extends CI_Controller {
         $config['cur_tag_close'] = '</a></li>';
 
         //limit end
-        $page = $this->uri->segment(3);
-
+        $page = trim($this->uri->segment(3));
+        
         //math to get the initial record to be select in the database
         $limit_end = ($page * $config['per_page']) - $config['per_page'];
         if ($limit_end < 0){
@@ -138,6 +138,9 @@ class Admin_orders extends CI_Controller {
             $config['total_rows'] = $data['count_orders'];
 
         }//!isset($manufacture_id) && !isset($search_string) && !isset($order)
+      if(empty($page)){
+          $page =1;
+      }
         $data['currentPage'] = isset($page) ? $page : 1;
         //initializate the panination helper 
         $this->pagination->initialize($config);   
