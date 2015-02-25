@@ -15,20 +15,6 @@ class Amazonorders extends CI_Controller {
     }
 
     public function index() {
-        $url = "https://mws.amazonservices.com/Orders/2011-01-01";
-        $post = "AWSAccessKeyId='" . $access_key . "'";
-        $post .= "&Action=ListOrders&MarketplaceId.Id.1='" . $marketplace_id . "'";
-        $post .= "&SellerId='" . $seller_id . "'";
-        $post .= "&LastUpdatedAfter=2010-10-04T18%3A12%3A21
-        &Timestamp=2010-10-05T18%3A12%3A21.687Z
-        &Version=2011-01-01";
-
-        curl_setopt($session, CURLOPT_URL, $url);
-        curl_setopt($session, CURLOPT_POST, 1);
-        curl_setopt($session, CURLOPT_HEADER, false);
-    }
-
-    public function test() {
 //      try { 
         set_time_limit(1500);
         echo $date = $this->obj->getOrderDetails();
@@ -85,17 +71,17 @@ class Amazonorders extends CI_Controller {
         } else {
             $ordersarray[0] = $orders;
         }
-
+        echo "<pre>";
+        print_r($ordersarray);
         foreach ($ordersarray as $key => $order) {
             $lastInsertedId = $this->obj->dumpAmazonOrderDetails(json_encode($ordersarray[$key]), $ordersarray[$key]);
-            $this->obj->saveOrderDetails($order);
             if ($order['OrderStatus'] == "Unshipped") {
-
+                $this->obj->saveOrderDetails($order);
                 $ordersarray[$key][$order['AmazonOrderId']] = $this->detailorder($order['AmazonOrderId'], $lastInsertedId);
                 if ($ordersarray[$key][$order['AmazonOrderId']]) {
                     $this->obj->dumpOrderIdData($lastInsertedId, json_encode($ordersarray[$key][$order['AmazonOrderId']]));
                 }
-             //   $this->shopifyAddOrders($ordersarray[$key], $lastInsertedId);
+                $this->shopifyAddOrders($ordersarray[$key], $lastInsertedId);
             }
         }
         echo "<pre>";
@@ -174,10 +160,10 @@ class Amazonorders extends CI_Controller {
         return $xml_array;
     }
 
-    public function shopifyAddOrders($orderDetails, $lastInsertedId,$extra = "") { 
-        
-       
-        
+    public function shopifyAddOrders($orderDetails, $lastInsertedId, $extra = "",$page = 1) {
+
+
+
         if (!isset($orderDetails[$orderDetails['AmazonOrderId']]['ListOrderItemsResult']['OrderItems']['OrderItem']['OrderItemId'])) {
             $orderCustom = $orderDetails[$orderDetails['AmazonOrderId']]['ListOrderItemsResult']['OrderItems']['OrderItem'];
             $itemcount = count($orderCustom);
@@ -192,29 +178,27 @@ class Amazonorders extends CI_Controller {
         $url = 'https://' . $API_KEY . ':' . $SECRET . '@' . $STORE_URL . '/admin/orders.json';
         $email = "ankush" . $this->randomAlphaString(4) . "@mobikasa.com";
         $country_code = $this->obj->getCountryCode($orderDetails['ShippingAddress']['CountryCode']);
-      
-         for ($j = 0; $j < $itemcount; $j++) {
-           
-               $skuStatus = $this->obj->checkSkuCodeExist($orderCustom[$j]['SellerSKU']);
-               if($skuStatus == false){
-                   break;
-               }
-         }
+
+        for ($j = 0; $j < $itemcount; $j++) {
+
+            $skuStatus = $this->obj->checkSkuCodeExist($orderCustom[$j]['SellerSKU']);
+            if ($skuStatus == false) {
+                break;
+            }
+        }
 
         if ($skuStatus) {
             $totalTax = 0;
             $totalItemsPrice = 0;
-            $Totalprice =0;
+            $Totalprice = 0;
             $data = "[";
             for ($i = 0; $i < $itemcount; $i++) {
                 $shopify_prd_details = $this->obj->matchSkuCode($orderCustom[$i]['SellerSKU']);
-                $price =  $orderCustom[$i]['ItemTax']['Amount'] +
-                        $orderCustom[$i]['ItemPrice']['Amount'];
-                $Totalprice = $Totalprice + $orderCustom[$i]['ItemTax']['Amount'] +
-                        $orderCustom[$i]['ItemPrice']['Amount'];
+                $price = ($orderCustom[$i]['ItemPrice']['Amount'] / $orderCustom[$i]['QuantityOrdered']);
+
                 $totalTax = $totalTax + $orderCustom[$i]['ItemTax']['Amount'];
                 $totalItemsPrice = $totalItemsPrice + $orderCustom[$i]['ItemPrice']['Amount'];
-                
+
                 $data .= '{
                       "variant_id": "' . mt_rand(5, 15) . '",
                       "title": "' . $orderCustom[$i]['Title'] . '",
@@ -228,13 +212,16 @@ class Amazonorders extends CI_Controller {
                 }
             }
             $data .= "]";
-            if($totalTax >0){
-            $taxPercent = ($totalTax)/$totalItemsPrice;
-           
-            }else{
+            $Totalprice = $totalItemsPrice + $totalTax;
+            if ($totalTax > 0) {
+                $taxPercent = ($totalTax) / $totalItemsPrice;
+            } else {
                 $taxPercent = 0;
             }
-        //    echo "totaltax: ".$totalTax.",totatlitemprice : ".$totalItemsPrice.",taxrate:".$taxRate;die;
+            $name = explode(" ", $orderDetails['BuyerName']);
+            $firstName = $name['0'];
+            $lastName = isset($name['1']) ? $name['1'] : $firstName;
+            //    echo "totaltax: ".$totalTax.",totatlitemprice : ".$totalItemsPrice.",taxrate:".$taxRate;die;
             $session = curl_init();
             curl_setopt($session, CURLOPT_URL, $url);
             curl_setopt($session, CURLOPT_POST, 1);
@@ -245,12 +232,12 @@ class Amazonorders extends CI_Controller {
                 "order": {
                   "line_items": ' . $data . ',
                    "customer": {
-                    "first_name": "' . $orderDetails['BuyerName'] . '",
-                    "last_name": "test"
+                    "first_name": "' . $firstName . '",
+                    "last_name":  "' . $lastName . '"
                     },
                   "billing_address": {
-                    "first_name":"' . $orderDetails['BuyerName'] . '",
-                     "last_name":"amazon",   
+                    "first_name":"' . $firstName . '",
+                     "last_name":"' . $lastName . '",
                     "address1": "' . $orderDetails['ShippingAddress']['AddressLine1'] . '",
                     "phone": "' . $orderDetails['ShippingAddress']['Phone'] . '",
                     "city": "' . $orderDetails['ShippingAddress']['City'] . '",
@@ -273,12 +260,12 @@ class Amazonorders extends CI_Controller {
                     {
                       "kind": "capture",
                       "status": "success",
-                      "amount": "'.$Totalprice.'"
+                      "amount": "' . $Totalprice . '"
                     }],
                     "processing_method" : "direct",
                     "subtotal_price" : "' . $orderDetails['OrderTotal']['Amount'] . '",
                     "total_price" : "' . $Totalprice . '",
-                        
+                    "total_tax" : "' . $totalTax . '",
                     "tax_lines": [
                     {
                       "price" : "' . $totalTax . '", 
@@ -293,7 +280,7 @@ class Amazonorders extends CI_Controller {
             curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($session, CURLOPT_SSL_VERIFYPEER, false);
             $jsondata = curl_exec($session);
-      
+
             //  print_r(curl_getinfo($session));die;
             if ($jsondata) {
                 $this->obj->dumpShopifyOrderDetails($jsondata, $lastInsertedId);
@@ -308,25 +295,32 @@ class Amazonorders extends CI_Controller {
             $jsondata = str_replace("\r", "", $jsondata);
             $obj = json_decode($jsondata, true);
             $output['response'] = $jsondata;
-//          print_r($obj);die;
-            if (!isset($obj['errors'])) {
-                $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'],"Updated",$obj['order']['id']);
+          
+            if (isset($obj['errors']) || isset($obj['error'])) {
+               
+                $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'], "Not Updated");
+                $reason = 'Error while creating shopify order , Please check shopify Attributes';
+                $this->notifybyemail('Travel Beauty shopify order creation failed', $reason);
+                $result = false;
+            } else {
+                
+                $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'], "Updated", $obj['order']['id']);
                 $result = true;
             }
         } else {
-             $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'],"Not Updated");
-            $reason = 'No matching SKU found for the the Amozon Sku Code, Please Update Sku Table. Amzon Order Id is :-'.$orderDetails['AmazonOrderId'];
+            $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'], "Not Updated");
+            $reason = 'No matching SKU found for the the Amozon Sku Code, Please Update Sku Table. Amzon Order Id is :-' . $orderDetails['AmazonOrderId'];
             $this->notifybyemail('Travel Beauty Sku Mismatch', $reason);
-             $result =  false;
+            $result = false;
         }
-        if(!empty($extra)){
-            
-             if($result){ 
+        if (!empty($extra)) {
+
+            if ($result) {
                 $this->session->set_flashdata('success', 'Order Createds on Shopify Successfully');
-             }else{
+            } else { 
                 $this->session->set_flashdata('error', 'Error While Creating Shopify Order, Please Update SKU table and retry');
-             }
-              redirect('admin/orders');
+            }
+            redirect('admin/orders/'.$page);
         }
     }
 
@@ -368,6 +362,7 @@ class Amazonorders extends CI_Controller {
 
     public function createShopifyOrder() {
         $amazonId = $_GET['id'];
+         $page = $_GET['page'];
         $id = $this->obj->getOrderDetailsId($amazonId);
 
         $orderDetails = $this->obj->getAmazonJsonData($amazonId);
@@ -378,14 +373,15 @@ class Amazonorders extends CI_Controller {
             $order_details[$order_details['AmazonOrderId']] = $order_amazon_details;
         }
 
-        $this->shopifyAddOrders($order_details, $id,"redirect");
+        $this->shopifyAddOrders($order_details, $id, "redirect",$page);
     }
+
     public function canceled() {
 //      try { 
         set_time_limit(1500);
         echo $date = $this->obj->getCancelOrderTimings();
         $this->obj->saveCancelOrderTimings();
-     
+
         $date = "2015-02-13";
         $tostring = "$date";
         $date = strtotime($tostring) + 1;
@@ -400,8 +396,8 @@ class Amazonorders extends CI_Controller {
         $param['Timestamp'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time());
         $param['Version'] = '2011-01-01';
         $param['MarketplaceId.Id.1'] = $this->config->item('marketplace_id');
-         $param['LastUpdatedAfter'] = date("Y-m-d\TH:i:s.\\0\\0\\0\\Z", $date);
-         $param['OrderStatus.Status.1'] = "Canceled";
+        $param['LastUpdatedAfter'] = date("Y-m-d\TH:i:s.\\0\\0\\0\\Z", $date);
+        $param['OrderStatus.Status.1'] = "Canceled";
         $timestamp = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z"); //"2010-10-05T18%3A12%3A31.687Z";
         $secret = $this->config->item('secret_key');
         $operation = "AWSECommerceService";
@@ -441,11 +437,11 @@ class Amazonorders extends CI_Controller {
         } else {
             $ordersarray[0] = $orders;
         }
-         foreach ($ordersarray as $key => $order) {
-            $updateOrder =  $this->obj->updateCanceledOrders($order['AmazonOrderId']);
-            $reason = 'Order With Amazon order id :'.$order['AmazonOrderId']. ' has been canceled';
-            $this->notifybyemail('Travel Beauty Order Canceled',$reason);
-         }
+        foreach ($ordersarray as $key => $order) {
+            $updateOrder = $this->obj->updateCanceledOrders($order['AmazonOrderId']);
+            $reason = 'Order With Amazon order id :' . $order['AmazonOrderId'] . ' has been canceled';
+            $this->notifybyemail('Travel Beauty Order Canceled', $reason);
+        }
         echo "<pre>";
         print_r($ordersarray);
 //        } catch (Exception $e) {
@@ -453,4 +449,5 @@ class Amazonorders extends CI_Controller {
 //            $this->notifybyemail('Travel Beauty Error',$reason);
 //        }
     }
+
 }

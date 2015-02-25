@@ -30,7 +30,7 @@ class Admin_products extends CI_Controller {
         $order_type = $this->input->post('order_type'); 
 
         //pagination settings
-        $config['per_page'] = 5;
+        $config['per_page'] = 25;
         $config['base_url'] = base_url().'admin/products';
         $config['use_page_numbers'] = TRUE;
         $config['num_links'] = 20;
@@ -169,7 +169,7 @@ class Admin_products extends CI_Controller {
             //form validation
             $this->form_validation->set_rules('amazon_sku', 'amazon_sku', 'required');
             $this->form_validation->set_rules('shopify_sku', 'shopify_sku', 'required');
-            $this->form_validation->set_rules('product_id', 'product_id', 'required|numeric');
+         
             $this->form_validation->set_error_delimiters('<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a><strong>', '</strong></div>');
 
             //if the form has passed through the validation

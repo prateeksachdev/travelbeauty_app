@@ -72,13 +72,7 @@
               <!--<span class="help-inline">Cost Price</span>-->
             </div>
           </div>
-          <div class="control-group">
-            <label for="inputError" class="control-label">product_id</label>
-            <div class="controls">
-              <input type="text" name="product_id" value="<?php echo set_value('product_id'); ?>">
-              <!--<span class="help-inline">OOps</span>-->
-            </div>
-          </div>
+       
          
           <div class="form-actions">
             <button class="btn btn-primary" type="submit">Save changes</button>

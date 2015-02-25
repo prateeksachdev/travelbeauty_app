@@ -58,7 +58,7 @@ class Admin_orders extends CI_Controller {
                 $order_type = $this->session->userdata('order_type');    
             }else{
                 //if we have nothing inside session, so it's the default "Asc"
-                $order_type = 'Asc';    
+                $order_type = 'DESC';    
             }
         }
         //make the data type var avaible to our view
@@ -138,7 +138,7 @@ class Admin_orders extends CI_Controller {
             $config['total_rows'] = $data['count_orders'];
 
         }//!isset($manufacture_id) && !isset($search_string) && !isset($order)
-
+        $data['currentPage'] = isset($page) ? $page : 1;
         //initializate the panination helper 
         $this->pagination->initialize($config);   
 

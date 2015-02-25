@@ -21,7 +21,23 @@
       <div class="row">
         <div class="span12 columns">
           <div class="well">
-           
+            <?php 
+         
+        if($this->session->flashdata('success'))
+        {
+          echo '<div class="alert alert-success">';
+            echo '<a class="close" data-dismiss="alert">×</a>';
+            echo '<strong>'.$this->session->flashdata('success');
+          echo '</div>';       
+        } 
+        if($this->session->flashdata('error'))
+        {
+          echo '<div class="alert alert-error">';
+            echo '<a class="close" data-dismiss="alert">×</a>';
+            echo '<strong>'.$this->session->flashdata('error');
+          echo '</div>';          
+        }
+        ?>
             <?php
            
             $attributes = array('class' => 'form-inline reset-margin', 'id' => 'myform');
@@ -65,10 +81,10 @@ height: 26px;"');
           <table class="table table-striped table-bordered table-condensed">
             <thead>
               <tr>
-                <th class="header">#</th>
+               
                 <th class="yellow header headerSortDown">Amazon order Id</th>
                 <th class="red header">Amazon Status</th>
-                <th class="red header">Amazon Sku</th>
+            
                 <th class="red header">Shopify Id</th>
                 <th class="red header">Action</th>
               </tr>
@@ -76,17 +92,17 @@ height: 26px;"');
             <tbody>
               <?php
               foreach($products as $row)
-              {
+              {  if($row['shopify_order_id'] !=0) $row['shopify_order_id'] = $row['shopify_order_id']; else $row['shopify_order_id'] = "-";
                 echo '<tr>';
-                echo '<td>'.$row['id'].'</td>';
+               
                 echo '<td>'.$row['order_id'].'</td>';
                 echo '<td>'.$row['amazon_order_status'].'</td>';
-                echo '<td>'.$row['amazon_sku'].'</td>';
+              
                 echo '<td>'.$row['shopify_order_id'].'</td>';
                 $line = '<td class="crud-actions">';
-                  if (empty($row['shopify_order_id']) && $row['amazon_order_status'] == "Unshipped")
+                  if (($row['shopify_order_id'] == 0)&& $row['amazon_order_status'] == "Unshipped")
                 {
-               $line .='<a href="http://localhost/travelbeauty_app/amazonorders/createShopifyOrder?id='.$row['order_id'].'" class="btn btn-info">REPROCESS</a>'; 
+               $line .='<a href="http://localhost/travelbeauty_app/amazonorders/createShopifyOrder?id='.$row['order_id'].'&page='. $currentPage .'" class="btn btn-info">REPROCESS</a>'; 
                
                 }
                 echo $line;
