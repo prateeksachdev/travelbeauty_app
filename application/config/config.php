@@ -372,7 +372,12 @@ $config['marketplace_id'] = "ATVPDKIKX0DER";
 $config['access_key'] = "AKIAIZVO6ZPOMHLXN7UA";
 $config['secret_key'] = "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";
 
+/* surprisepost  Access keys */
+$config['shopify_api_key'] = "d68564b222657cb012f2e8c19c91b38e";
+$config['shopify_secret_key'] = "97252c5d0a7178538c5abaae6f909ce7";
+$config['shopify_store_url'] = "surprisepost.myshopify.com";
 
-$config['shopify_api_key'] = "bd007e9f6acceaf34b6d295ce96bac52";
-$config['shopify_secret_key'] = "7218cebc88042d40a2782308b3882879";
-$config['shopify_store_url'] = "florists-com.myshopify.com";
+/* Florists  Access keys */
+// $config['shopify_api_key'] = "bd007e9f6acceaf34b6d295ce96bac52";
+// $config['shopify_secret_key'] = "7218cebc88042d40a2782308b3882879";
+// $config['shopify_store_url'] = "florists-com.myshopify.com";
