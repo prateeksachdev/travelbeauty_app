@@ -71,8 +71,7 @@ class Amazonorders extends CI_Controller {
         } else {
             $ordersarray[0] = $orders;
         }
-        echo "<pre>";
-        print_r($ordersarray);
+       
         foreach ($ordersarray as $key => $order) {
             $lastInsertedId = $this->obj->dumpAmazonOrderDetails(json_encode($ordersarray[$key]), $ordersarray[$key]);
             if ($order['OrderStatus'] == "Unshipped") {
