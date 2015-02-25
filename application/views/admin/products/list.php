@@ -39,8 +39,7 @@
                 echo form_label('Search Amazon Sku:', 'search_string');
                 echo form_input('search_string', $search_string_selected, 'style="width: 170px;height: 26px;"');
 
-                echo form_label('Filter:', 'manufacture_id');
-                echo form_dropdown('manufacture_id', $options_manufacture, $manufacture_selected, 'class="span2"');
+           
 
                 echo form_label('Order by:', 'order');
                 echo form_dropdown('order', $options_products, $order, 'class="span2"');
