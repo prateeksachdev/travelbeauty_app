@@ -362,7 +362,10 @@ $config['proxy_ips'] = '';
 /* Location: ./application/config/config.php */
 //$config['base_url'] = "http://bloomnet.mobikasa.com/";
 /*For live site*/
-
+$config['seller_id'] = "A2THW3MTISTUM9";
+$config['marketplace_id'] = "ATVPDKIKX0DER";
+$config['access_key'] = "AKIAIZVO6ZPOMHLXN7UA";
+$config['secret_key'] = "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";
 
 $config['base_url'] = "http://app.travelbeauty.com/";
 /* Shopify store key credentials  */
