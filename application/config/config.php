@@ -364,7 +364,7 @@ $config['proxy_ips'] = '';
 /* Location: ./application/config/config.php */
 
 //$config['base_url'] = "http://localhost/travelbeauty_app/";
-$config['base_url'] = "http://localhost/travelbeauty/";
+$config['base_url'] = "http://app.travelbeauty.com/";
 
 /* Amazon Access keys */
 $config['seller_id'] = "A2THW3MTISTUM9";
