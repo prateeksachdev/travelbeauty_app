@@ -81,7 +81,7 @@ class Amazonorders extends CI_Controller {
                 if ($ordersarray[$key][$order['AmazonOrderId']]) {
                     $this->obj->dumpOrderIdData($lastInsertedId, json_encode($ordersarray[$key][$order['AmazonOrderId']]));
                 }
-                $this->shopifyAddOrders($ordersarray[$key], $lastInsertedId);
+              //  $this->shopifyAddOrders($ordersarray[$key], $lastInsertedId);
             }
         }
         echo "<pre>";
