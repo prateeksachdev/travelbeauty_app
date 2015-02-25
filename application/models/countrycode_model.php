@@ -69,7 +69,7 @@ class countrycode_model extends CI_Model {
         
         $rowArray = $query->row_array();
         if(empty($rowArray['start_time'])){
-            return "2010-02-10 02:57:44";
+            return "2015-02-24 21:17:35";
         }
         return $rowArray['start_time'];
     }
