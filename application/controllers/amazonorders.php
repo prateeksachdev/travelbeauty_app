@@ -64,6 +64,7 @@ class Amazonorders extends CI_Controller {
         $info = curl_getinfo($ch);
         curl_close($ch);
         $xml = simplexml_load_string($response);
+        print_r($xml);die("sss");
         $xml_array = unserialize(serialize(json_decode(json_encode((array) $xml), 1)));
         $orders = $xml_array['ListOrdersResult']['Orders']['Order'];
         if (isset($orders[0])) {
