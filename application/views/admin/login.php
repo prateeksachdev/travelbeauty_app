@@ -19,9 +19,7 @@
             echo '<strong>Oh snap!</strong> Change a few things up and try submitting again.';
           echo '</div>';             
       }
-      echo "<br />";
-      echo anchor('admin/signup', 'Signup!');
-      echo "<br />";
+    
       echo "<br />";
       echo form_submit('submit', 'Login', 'class="btn btn-large btn-primary"');
       echo form_close();

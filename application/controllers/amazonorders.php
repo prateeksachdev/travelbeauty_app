@@ -316,7 +316,7 @@ class Amazonorders extends CI_Controller {
         if (!empty($extra)) {
 
             if ($result) {
-                $this->session->set_flashdata('success', 'Order Createds on Shopify Successfully');
+                $this->session->set_flashdata('success', 'Order Created on Shopify Successfully');
             } else { 
                 $this->session->set_flashdata('error', 'Error While Creating Shopify Order, Please Update SKU table and retry');
             }

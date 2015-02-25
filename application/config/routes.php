@@ -44,8 +44,7 @@ $route['404_override'] = '';
 
 /*admin*/
 $route['admin'] = 'user/index';
-$route['admin/signup'] = 'user/signup';
-$route['admin/create_member'] = 'user/create_member';
+
 $route['admin/login'] = 'user/index';
 $route['admin/logout'] = 'user/logout';
 $route['admin/login/validate_credentials'] = 'user/validate_credentials';
