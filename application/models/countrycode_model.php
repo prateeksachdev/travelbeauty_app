@@ -58,7 +58,7 @@ class countrycode_model extends CI_Model {
         
         $rowArray = $query->row_array();
         if(empty($rowArray['purchase_date'])){
-            return "2015-02-25 01:01:00";
+            return "2015-02-24 01:01:00";
         }
         return $rowArray['purchase_date'];
     }
