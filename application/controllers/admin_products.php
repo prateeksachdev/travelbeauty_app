@@ -169,6 +169,8 @@ class Admin_products extends CI_Controller {
             //form validation
             $this->form_validation->set_rules('amazon_sku', 'amazon_sku', 'required');
             $this->form_validation->set_rules('shopify_sku', 'shopify_sku', 'required');
+               $this->form_validation->set_rules('product_id', 'product_id', 'required');
+            $this->form_validation->set_rules('variant_id', 'variant_id', 'required');
          
             $this->form_validation->set_error_delimiters('<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a><strong>', '</strong></div>');
 
@@ -185,7 +187,7 @@ class Admin_products extends CI_Controller {
                     'amazon_sku' => $this->input->post('amazon_sku'),
                     'shopify_sku' => $this->input->post('shopify_sku'),
                     'product_id' => $this->input->post('product_id'),          
-                    'manufacture_id' => $this->input->post('manufacture_id')
+                    'variant_id' => $this->input->post('variant_id')
                 );
 			
 			if($this->products_model->store_product($data_to_store))
@@ -221,6 +223,7 @@ class Admin_products extends CI_Controller {
             $this->form_validation->set_rules('amazon_sku', 'amazon_sku', 'required');
             $this->form_validation->set_rules('shopify_sku', 'shopify_sku', 'required');
             $this->form_validation->set_rules('product_id', 'product_id', 'required');
+            $this->form_validation->set_rules('product_id', 'variant_id', 'required');
             $this->form_validation->set_error_delimiters('<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a><strong>', '</strong></div>');
             //if the form has passed through the validation
             if ($this->form_validation->run())
@@ -230,7 +233,7 @@ class Admin_products extends CI_Controller {
                     'amazon_sku' => $this->input->post('amazon_sku'),
                     'shopify_sku' => $this->input->post('shopify_sku'),
                     'product_id' => $this->input->post('product_id'),          
-                    'manufacture_id' => $this->input->post('manufacture_id')
+                    'variant_id' => $this->input->post('variant_id'),
                 );
                 //if the insert has returned true then we show the flash message
                 if($this->products_model->update_product($id, $data_to_store) == TRUE){

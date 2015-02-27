@@ -72,6 +72,21 @@
               <!--<span class="help-inline">Cost Price</span>-->
             </div>
           </div>
+             <div class="control-group">
+            <label for="inputError" class="control-label">Product id</label>
+            <div class="controls">
+              <input type="text" id="" name="product_id" value="<?php echo set_value('product_id'); ?>" >
+              <!--<span class="help-inline">Woohoo!</span>-->
+            </div>
+          </div>
+             
+          <div class="control-group">
+            <label for="inputError" class="control-label">Variant id</label>
+            <div class="controls">
+              <input type="text" id="" name="variant_id" value="<?php echo set_value('variant_id'); ?>">
+              <!--<span class="help-inline">Cost Price</span>-->
+            </div>
+          </div>
        
          
           <div class="form-actions">

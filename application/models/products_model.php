@@ -42,17 +42,15 @@ class Products_model extends CI_Model {
 		$this->db->select('amazon_sku_match.amazon_sku');
 		$this->db->select('amazon_sku_match.shopify_sku');
 		$this->db->select('amazon_sku_match.product_id');
-		//$this->db->select('products.manufacture_id');
+		$this->db->select('amazon_sku_match.variant_id');
 		//$this->db->select('manufacturers.name as manufacture_name');
 		$this->db->from('amazon_sku_match');
-		if($manufacture_id != null && $manufacture_id != 0){
-			$this->db->where('manufacture_id', $manufacture_id);
-		}
+		
 		if($search_string){
 			$this->db->like('amazon_sku', $search_string);
 		}
 
-		$this->db->join('manufacturers', 'amazon_sku_match.manufacture_id = manufacturers.id', 'left');
+		
 
 		$this->db->group_by('amazon_sku_match.id');
 
@@ -83,9 +81,7 @@ class Products_model extends CI_Model {
     {
 		$this->db->select('*');
 		$this->db->from('amazon_sku_match');
-		if($manufacture_id != null && $manufacture_id != 0){
-			$this->db->where('manufacture_id', $manufacture_id);
-		}
+		
 		if($search_string){
 			$this->db->like('amazon_sku', $search_string);
 		}
@@ -124,7 +120,7 @@ class Products_model extends CI_Model {
     * @return boolean
     */
     function update_product($id, $data)
-    {
+    {       
 		$this->db->where('id', $id);
 		$this->db->update('amazon_sku_match', $data);
 		$report = array();

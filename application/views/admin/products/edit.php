@@ -20,7 +20,7 @@
       
       <div class="page-header">
         <h2>
-          Updating <?php echo ucfirst($this->uri->segment(2));?>
+          Updating Sku Table
         </h2>
       </div>
 
@@ -67,23 +67,31 @@
           </div>
                   
           <div class="control-group">
-            <label for="inputError" class="control-label">Cost Price</label>
+            <label for="inputError" class="control-label">Shopify Sku</label>
             <div class="controls">
               <input type="text" id="" name="shopify_sku" value="<?php echo $product[0]['shopify_sku'];?>">
               <!--<span class="help-inline">Cost Price</span>-->
             </div>
           </div>
           <div class="control-group">
-            <label for="inputError" class="control-label">Sell Price</label>
+            <label for="inputError" class="control-label">Product id</label>
             <div class="controls">
               <input type="text" name="product_id" value="<?php echo $product[0]['product_id']; ?>">
+              <!--<span class="help-inline">OOps</span>-->
+            </div>
+          </div>
+             <div class="control-group">
+            <label for="inputError" class="control-label">Variant id</label>
+            <div class="controls">
+              <input type="text" name="variant_id" value="<?php echo $product[0]['variant_id']; ?>">
               <!--<span class="help-inline">OOps</span>-->
             </div>
           </div>
           
           <div class="form-actions">
             <button class="btn btn-primary" type="submit">Save changes</button>
-            <button class="btn" type="reset">Cancel</button>
+            <?php echo '<a href="' . site_url("admin") . '/products" class="btn">Cancel</a>'; ?> 
+       
           </div>
         </fieldset>
 

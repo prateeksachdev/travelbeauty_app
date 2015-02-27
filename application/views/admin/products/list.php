@@ -62,7 +62,8 @@
 
                         <th class="yellow header headerSortDown">Amazon Sku</th>
                         <th class="red header">Shopify Sku</th>
-
+                          <th class="yellow header headerSortDown">Product Id</th>
+                        <th class="red header">Variant Id</th>
                         <th class="red header">Actions</th>
                     </tr>
                 </thead>
@@ -73,6 +74,8 @@
 
                         echo '<td>' . $row['amazon_sku'] . '</td>';
                         echo '<td>' . $row['shopify_sku'] . '</td>';
+                          echo '<td>' . $row['product_id'] . '</td>';
+                        echo '<td>' . $row['variant_id'] . '</td>';
 
                         echo '<td class="crud-actions">
                   <a href="' . site_url("admin") . '/products/update/' . $row['id'] . '" class="btn btn-info">view & edit</a>  

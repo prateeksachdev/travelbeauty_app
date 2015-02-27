@@ -15,8 +15,8 @@ class Amazonorders extends CI_Controller {
     }
 
     public function index() {
-//      try { 
-        set_time_limit(1500);
+   try { 
+        
         echo $date = $this->obj->getOrderDetails();
         $tostring = "$date";
         $date = strtotime($tostring) + 1;
@@ -72,7 +72,7 @@ class Amazonorders extends CI_Controller {
         } else {
             $ordersarray[0] = $orders;
         }
-       
+      
         foreach ($ordersarray as $key => $order) {
             $lastInsertedId = $this->obj->dumpAmazonOrderDetails(json_encode($ordersarray[$key]), $ordersarray[$key]);
             if ($order['OrderStatus'] == "Unshipped") {
@@ -86,10 +86,10 @@ class Amazonorders extends CI_Controller {
         }
         echo "<pre>";
         print_r($ordersarray);
-//        } catch (Exception $e) {
-//            $reason = 'There was some error while fatching the amazon orders and placing them on shopify, Please have a look.';
-//            $this->notifybyemail('Travel Beauty Error',$reason);
-//        }
+        } catch (Exception $e) {
+            $reason = 'There was some error while fatching the amazon orders and placing them on shopify, Please have a look.';
+            $this->notifybyemail('Amazon Order',$reason);
+        }
     }
 
     function createSignature($operation, $timestamp, $secret) {
@@ -200,7 +200,7 @@ class Amazonorders extends CI_Controller {
                 $totalItemsPrice = $totalItemsPrice + $orderCustom[$i]['ItemPrice']['Amount'];
 
                 $data .= '{
-                      "variant_id": "' . mt_rand(5, 15) . '",
+                      "variant_id": "' . $shopify_prd_details['variant_id'] . '",
                       "title": "' . $orderCustom[$i]['Title'] . '",
                       "price": "' . $price . '",
                       "sku" : "' . $shopify_prd_details['shopify_sku'] . '",
@@ -212,6 +212,7 @@ class Amazonorders extends CI_Controller {
                 }
             }
             $data .= "]";
+         
             $Totalprice = $totalItemsPrice + $totalTax;
             if ($totalTax > 0) {
                 $taxPercent = ($totalTax) / $totalItemsPrice;
@@ -232,8 +233,8 @@ class Amazonorders extends CI_Controller {
                 "order": {
                   "line_items": ' . $data . ',
                    "customer": {
-                    "first_name": "' . $firstName . '",
-                    "last_name":  "' . $lastName . '"
+                    "first_name": "Amazon",
+                    "last_name":  "Order"
                     },
                   "billing_address": {
                     "first_name":"' . $firstName . '",
@@ -247,7 +248,7 @@ class Amazonorders extends CI_Controller {
                   },
                   "shipping_address": {
                     "first_name":"' . $orderDetails['BuyerName'] . '",
-                     "last_name":"amazon",       
+                       "last_name":"' . $lastName . '",    
                     "address1": "' . $orderDetails['ShippingAddress']['AddressLine1'] . '",
                     "phone": "' . $orderDetails['ShippingAddress']['Phone'] . '",
                     "city": "' . $orderDetails['ShippingAddress']['City'] . '",
@@ -255,6 +256,7 @@ class Amazonorders extends CI_Controller {
                     "country": "' . $country_code . '",
                     "zip": "' . $orderDetails['ShippingAddress']['PostalCode'] . '"
                   },
+                  "source_name" : "Amazon",
                    "email": "info@travelbeauty.com",
                    "transactions": [
                     {
@@ -375,79 +377,4 @@ class Amazonorders extends CI_Controller {
 
         $this->shopifyAddOrders($order_details, $id, "redirect",$page);
     }
-
-    public function canceled() {
-//      try { 
-        set_time_limit(1500);
-        echo $date = $this->obj->getCancelOrderTimings();
-        $this->obj->saveCancelOrderTimings();
-
-        $date = "2015-02-13";
-        $tostring = "$date";
-        $date = strtotime($tostring) + 1;
-        $mysql = date("Y-m-d H:i:s", $date);
-        $param = array();
-        $param['AWSAccessKeyId'] = $this->config->item('access_key');
-        $param['Action'] = 'ListOrders';
-        $param['SellerId'] = $this->config->item('seller_id');
-        //$param['Signature'] = 'ZQLpf8vEXAMPLE0iC265pf18n0%3D';
-        $param['SignatureMethod'] = 'HmacSHA256';
-        $param['SignatureVersion'] = '2';
-        $param['Timestamp'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time());
-        $param['Version'] = '2011-01-01';
-        $param['MarketplaceId.Id.1'] = $this->config->item('marketplace_id');
-        $param['LastUpdatedAfter'] = date("Y-m-d\TH:i:s.\\0\\0\\0\\Z", $date);
-        $param['OrderStatus.Status.1'] = "Canceled";
-        $timestamp = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z"); //"2010-10-05T18%3A12%3A31.687Z";
-        $secret = $this->config->item('secret_key');
-        $operation = "AWSECommerceService";
-        $url = array();
-        Ksort($param);
-        foreach ($param as $key => $val) {
-            $key = str_replace("%7E", "~", rawurlencode($key));
-            $val = str_replace("%7E", "~", rawurlencode($val));
-            $url[] = "{$key}={$val}";
-        }
-        sort($url);
-        $arr = implode('&', $url);
-        $sign = 'GET' . "\n";
-        $sign .= 'mws.amazonservices.com' . "\n";
-        $sign .= '/Orders/2015-01-28' . "\n";
-        $sign .= $arr;
-        $signature = hash_hmac("sha256", $sign, $secret, true);
-        $signature = urlencode(base64_encode($signature));
-        //  $signature = $this->createSignature($param['Signature'],$timestamp,$secret);
-
-        $link = "https://mws.amazonservices.com/Orders/2015-01-28?";
-        $link .= $arr . "&Signature=" . $signature;
-
-        $ch = curl_init($link);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/xml'));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        $response = curl_exec($ch);
-
-        $info = curl_getinfo($ch);
-        curl_close($ch);
-        $xml = simplexml_load_string($response);
-        $xml_array = unserialize(serialize(json_decode(json_encode((array) $xml), 1)));
-        $orders = $xml_array['ListOrdersResult']['Orders']['Order'];
-        if (isset($orders[0])) {
-            $ordersarray = $orders;
-        } else {
-            $ordersarray[0] = $orders;
-        }
-        foreach ($ordersarray as $key => $order) {
-            $updateOrder = $this->obj->updateCanceledOrders($order['AmazonOrderId']);
-            $reason = 'Order With Amazon order id :' . $order['AmazonOrderId'] . ' has been canceled';
-            $this->notifybyemail('Travel Beauty Order Canceled', $reason);
-        }
-        echo "<pre>";
-        print_r($ordersarray);
-//        } catch (Exception $e) {
-//            $reason = 'There was some error while fatching the amazon orders and placing them on shopify, Please have a look.';
-//            $this->notifybyemail('Travel Beauty Error',$reason);
-//        }
-    }
-
 }

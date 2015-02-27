@@ -23,7 +23,7 @@ class countrycode_model extends CI_Model {
             return False;
     }
     public function matchSkuCode($code) {
-        $query = $this->db->query("SELECT shopify_sku,product_id from amazon_sku_match  WHERE  amazon_sku = trim('" . $code . "') ");
+        $query = $this->db->query("SELECT * from amazon_sku_match  WHERE  amazon_sku = trim('" . $code . "') ");
         $rowArray = $query->row_array();
      
         if (!empty($rowArray['shopify_sku'])) {
@@ -123,6 +123,11 @@ class countrycode_model extends CI_Model {
     public function updateSkuInOrderDetails($amazonOrderId,$sku) {
          $query = $this->db->query("update `order_details` set `amazon_sku` ='$sku' where order_id = '" . $amazonOrderId . "' ");
         
+    }
+    public function createShopifyProductTable($sku,$product_id,$variant_id) {
+         echo  $query = $this->db->query("Insert into shopify_table(sku,product_id,variant_id) values ('" . $sku . "','" . $product_id . "','" . $variant_id . "')");
+       
+         return $id;
     }
 }
 
