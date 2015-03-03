@@ -85,7 +85,7 @@ height: 26px;"');
                 <th class="yellow header headerSortDown">Amazon order Id</th>
                 <th class="red header">Amazon Status</th>
             
-                <th class="red header">Shopify Id</th>
+                <th class="red header">Shopify Order Id</th>
                 <th class="red header">Action</th>
               </tr>
             </thead>

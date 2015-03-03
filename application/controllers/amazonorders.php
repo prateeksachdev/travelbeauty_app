@@ -297,7 +297,7 @@ class Amazonorders extends CI_Controller {
             $jsondata = str_replace("\r", "", $jsondata);
             $obj = json_decode($jsondata, true);
             $output['response'] = $jsondata;
-          
+           
             if (isset($obj['errors']) || isset($obj['error'])) {
                
                 $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'], "Not Updated");
@@ -305,8 +305,8 @@ class Amazonorders extends CI_Controller {
                 $this->notifybyemail('Travel Beauty shopify order creation failed', $reason);
                 $result = false;
             } else {
-                
-                $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'], "Updated", $obj['order']['id']);
+                 $shopifyOrderId = ltrim($obj['order']['name'], '#');
+                $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'], "Updated", $shopifyOrderId);
                 $result = true;
             }
         } else {
