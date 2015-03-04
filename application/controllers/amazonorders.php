@@ -81,7 +81,7 @@ class Amazonorders extends CI_Controller {
                     if ($ordersarray[$key][$order['AmazonOrderId']]) {
                         $this->obj->dumpOrderIdData($lastInsertedId, json_encode($ordersarray[$key][$order['AmazonOrderId']]));
                     }
-                    //  $this->shopifyAddOrders($ordersarray[$key], $lastInsertedId);
+                     $this->shopifyAddOrders($ordersarray[$key], $lastInsertedId);
                 }
             }
             echo "<pre>";
@@ -315,7 +315,8 @@ class Amazonorders extends CI_Controller {
                 $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'], "Not Updated");
                 $reason = 'Hi,<br/>This order information could not be copied over to Shopify due to the following reason :<br/>
                             There was no shopify SKU information present for items in this order. Please update the SKU match table and reprocess it from the dashboard.';
-                $this->notifybyemail('Amazon Order', $reason);
+                $subject = 'Amazon Order :-'.$orderDetails['AmazonOrderId'];
+                $this->notifybyemail($subject, $reason);
                 $result = false;
             } else {
                 $shopifyOrderId = ltrim($obj['order']['name'], '#');
@@ -334,8 +335,8 @@ class Amazonorders extends CI_Controller {
                 if ($r < ($skucount -1))
                     $reason .= ",";
             }
-           
-            $this->notifybyemail('Amazon Order', $reason);
+            $subject = 'Amazon Order :-'.$orderDetails['AmazonOrderId'];
+            $this->notifybyemail($subject, $reason);
             $result = false;
         }
         if (!empty($extra)) {
