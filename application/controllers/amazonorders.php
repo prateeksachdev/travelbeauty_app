@@ -315,7 +315,7 @@ class Amazonorders extends CI_Controller {
                 $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'], "Not Updated");
                 $reason = 'Hi,<br/>This order information could not be copied over to Shopify due to the following reason :<br/>
                             There was no shopify SKU information present for items in this order. Please update the SKU match table and reprocess it from the dashboard.';
-                $subject = 'Amazon Order :-'.$orderDetails['AmazonOrderId'];
+                $subject = 'Amazon Order #'.$orderDetails['AmazonOrderId'].'could not be processed';
                 $this->notifybyemail($subject, $reason);
                 $result = false;
             } else {
@@ -335,7 +335,7 @@ class Amazonorders extends CI_Controller {
                 if ($r < ($skucount -1))
                     $reason .= ",";
             }
-            $subject = 'Amazon Order :-'.$orderDetails['AmazonOrderId'];
+            $subject = 'Amazon Order #'.$orderDetails['AmazonOrderId'].'could not be processed';
             $this->notifybyemail($subject, $reason);
             $result = false;
         }
