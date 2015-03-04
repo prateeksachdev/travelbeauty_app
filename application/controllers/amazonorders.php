@@ -15,80 +15,80 @@ class Amazonorders extends CI_Controller {
     }
 
     public function index() {
-   try { 
-        
-        echo $date = $this->obj->getOrderDetails();
-        $tostring = "$date";
-        $date = strtotime($tostring) + 1;
-        $mysql = date("Y-m-d H:i:s", $date);
-        $param = array();
-        $param['AWSAccessKeyId'] = $this->config->item('access_key');
-        $param['Action'] = 'ListOrders';
-        $param['SellerId'] = $this->config->item('seller_id');
-        //$param['Signature'] = 'ZQLpf8vEXAMPLE0iC265pf18n0%3D';
-        $param['SignatureMethod'] = 'HmacSHA256';
-        $param['SignatureVersion'] = '2';
-        $param['Timestamp'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time());
-        $param['Version'] = '2011-01-01';
-        $param['MarketplaceId.Id.1'] = $this->config->item('marketplace_id');
-        $param['CreatedAfter'] = date("Y-m-d\TH:i:s.\\0\\0\\0\\Z", $date);
-        $timestamp = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z"); //"2010-10-05T18%3A12%3A31.687Z";
-        $secret = $this->config->item('secret_key');
-        $operation = "AWSECommerceService";
-        $url = array();
-        Ksort($param);
-        foreach ($param as $key => $val) {
-            $key = str_replace("%7E", "~", rawurlencode($key));
-            $val = str_replace("%7E", "~", rawurlencode($val));
-            $url[] = "{$key}={$val}";
-        }
-        sort($url);
-        $arr = implode('&', $url);
-        $sign = 'GET' . "\n";
-        $sign .= 'mws.amazonservices.com' . "\n";
-        $sign .= '/Orders/2015-01-28' . "\n";
-        $sign .= $arr;
-        $signature = hash_hmac("sha256", $sign, $secret, true);
-        $signature = urlencode(base64_encode($signature));
-        //  $signature = $this->createSignature($param['Signature'],$timestamp,$secret);
+        try {
 
-        $link = "https://mws.amazonservices.com/Orders/2015-01-28?";
-        $link .= $arr . "&Signature=" . $signature;
-
-        $ch = curl_init($link);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/xml'));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-        $response = curl_exec($ch);
-
-        $info = curl_getinfo($ch);
-        curl_close($ch);
-        $xml = simplexml_load_string($response);
-   
-        $xml_array = unserialize(serialize(json_decode(json_encode((array) $xml), 1)));
-        $orders = $xml_array['ListOrdersResult']['Orders']['Order'];
-        if (isset($orders[0])) {
-            $ordersarray = $orders;
-        } else {
-            $ordersarray[0] = $orders;
-        }
-      
-        foreach ($ordersarray as $key => $order) {
-            $lastInsertedId = $this->obj->dumpAmazonOrderDetails(json_encode($ordersarray[$key]), $ordersarray[$key]);
-            if ($order['OrderStatus'] == "Unshipped") {
-                $this->obj->saveOrderDetails($order);
-                $ordersarray[$key][$order['AmazonOrderId']] = $this->detailorder($order['AmazonOrderId'], $lastInsertedId);
-                if ($ordersarray[$key][$order['AmazonOrderId']]) {
-                    $this->obj->dumpOrderIdData($lastInsertedId, json_encode($ordersarray[$key][$order['AmazonOrderId']]));
-                }
-              //  $this->shopifyAddOrders($ordersarray[$key], $lastInsertedId);
+            echo $date = $this->obj->getOrderDetails();
+            $tostring = "$date";
+            $date = strtotime($tostring) + 1;
+            $mysql = date("Y-m-d H:i:s", $date);
+            $param = array();
+            $param['AWSAccessKeyId'] = $this->config->item('access_key');
+            $param['Action'] = 'ListOrders';
+            $param['SellerId'] = $this->config->item('seller_id');
+            //$param['Signature'] = 'ZQLpf8vEXAMPLE0iC265pf18n0%3D';
+            $param['SignatureMethod'] = 'HmacSHA256';
+            $param['SignatureVersion'] = '2';
+            $param['Timestamp'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time());
+            $param['Version'] = '2011-01-01';
+            $param['MarketplaceId.Id.1'] = $this->config->item('marketplace_id');
+            $param['CreatedAfter'] = date("Y-m-d\TH:i:s.\\0\\0\\0\\Z", $date);
+            $timestamp = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z"); //"2010-10-05T18%3A12%3A31.687Z";
+            $secret = $this->config->item('secret_key');
+            $operation = "AWSECommerceService";
+            $url = array();
+            Ksort($param);
+            foreach ($param as $key => $val) {
+                $key = str_replace("%7E", "~", rawurlencode($key));
+                $val = str_replace("%7E", "~", rawurlencode($val));
+                $url[] = "{$key}={$val}";
             }
-        }
-        echo "<pre>";
-        print_r($ordersarray);
+            sort($url);
+            $arr = implode('&', $url);
+            $sign = 'GET' . "\n";
+            $sign .= 'mws.amazonservices.com' . "\n";
+            $sign .= '/Orders/2015-01-28' . "\n";
+            $sign .= $arr;
+            $signature = hash_hmac("sha256", $sign, $secret, true);
+            $signature = urlencode(base64_encode($signature));
+            //  $signature = $this->createSignature($param['Signature'],$timestamp,$secret);
+
+            $link = "https://mws.amazonservices.com/Orders/2015-01-28?";
+            $link .= $arr . "&Signature=" . $signature;
+
+            $ch = curl_init($link);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/xml'));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            $response = curl_exec($ch);
+
+            $info = curl_getinfo($ch);
+            curl_close($ch);
+            $xml = simplexml_load_string($response);
+
+            $xml_array = unserialize(serialize(json_decode(json_encode((array) $xml), 1)));
+            $orders = $xml_array['ListOrdersResult']['Orders']['Order'];
+            if (isset($orders[0])) {
+                $ordersarray = $orders;
+            } else {
+                $ordersarray[0] = $orders;
+            }
+
+            foreach ($ordersarray as $key => $order) {
+                $lastInsertedId = $this->obj->dumpAmazonOrderDetails(json_encode($ordersarray[$key]), $ordersarray[$key]);
+                if ($order['OrderStatus'] == "Unshipped") {
+                    $this->obj->saveOrderDetails($order);
+                    $ordersarray[$key][$order['AmazonOrderId']] = $this->detailorder($order['AmazonOrderId'], $lastInsertedId);
+                    if ($ordersarray[$key][$order['AmazonOrderId']]) {
+                        $this->obj->dumpOrderIdData($lastInsertedId, json_encode($ordersarray[$key][$order['AmazonOrderId']]));
+                    }
+                    //  $this->shopifyAddOrders($ordersarray[$key], $lastInsertedId);
+                }
+            }
+            echo "<pre>";
+            print_r($ordersarray);
         } catch (Exception $e) {
-            $reason = 'There was some error while fatching the amazon orders and placing them on shopify, Please have a look.';
-            $this->notifybyemail('Amazon Order',$reason);
+            $reason = $e->getMessage();
+            $this->notifybyemail('Amazon Order', $reason);
         }
     }
 
@@ -160,7 +160,7 @@ class Amazonorders extends CI_Controller {
         return $xml_array;
     }
 
-    public function shopifyAddOrders($orderDetails, $lastInsertedId, $extra = "",$page = 1) {
+    public function shopifyAddOrders($orderDetails, $lastInsertedId, $extra = "", $page = 1) {
 
 
 
@@ -180,7 +180,7 @@ class Amazonorders extends CI_Controller {
         $country_code = $this->obj->getCountryCode($orderDetails['ShippingAddress']['CountryCode']);
 
         for ($j = 0; $j < $itemcount; $j++) {
-
+            $saveSkuForEmail[] = $orderCustom[$j]['SellerSKU'];
             $skuStatus = $this->obj->checkSkuCodeExist($orderCustom[$j]['SellerSKU']);
             if ($skuStatus == false) {
                 break;
@@ -212,7 +212,7 @@ class Amazonorders extends CI_Controller {
                 }
             }
             $data .= "]";
-         
+
             $Totalprice = $totalItemsPrice + $totalTax;
             if ($totalTax > 0) {
                 $taxPercent = ($totalTax) / $totalItemsPrice;
@@ -220,8 +220,20 @@ class Amazonorders extends CI_Controller {
                 $taxPercent = 0;
             }
             $name = explode(" ", $orderDetails['BuyerName']);
-            $firstName = $name['0'];
-            $lastName = isset($name['1']) ? $name['1'] : $firstName;
+            $nameCount = count($name);
+
+
+            if ($nameCount > 1) {
+                $firstName = "";
+                for ($k = 0; $k < $nameCount - 1; $k++) {
+                    $firstName .=$name[$k]." ";
+                }
+                end($name);
+                $lastName = $name[key($name)];
+            } else {
+                $firstName = $name[0];
+                $lastName = $firstName;
+            }
             //    echo "totaltax: ".$totalTax.",totatlitemprice : ".$totalItemsPrice.",taxrate:".$taxRate;die;
             $session = curl_init();
             curl_setopt($session, CURLOPT_URL, $url);
@@ -247,7 +259,7 @@ class Amazonorders extends CI_Controller {
                     "zip": "' . $orderDetails['ShippingAddress']['PostalCode'] . '"
                   },
                   "shipping_address": {
-                    "first_name":"' . $orderDetails['BuyerName'] . '",
+                    "first_name":"' . $firstName . '",
                        "last_name":"' . $lastName . '",    
                     "address1": "' . $orderDetails['ShippingAddress']['AddressLine1'] . '",
                     "phone": "' . $orderDetails['ShippingAddress']['Phone'] . '",
@@ -297,32 +309,43 @@ class Amazonorders extends CI_Controller {
             $jsondata = str_replace("\r", "", $jsondata);
             $obj = json_decode($jsondata, true);
             $output['response'] = $jsondata;
-           
+
             if (isset($obj['errors']) || isset($obj['error'])) {
-               
+
                 $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'], "Not Updated");
-                $reason = 'Error while creating shopify order , Please check shopify Attributes';
-                $this->notifybyemail('Travel Beauty shopify order creation failed', $reason);
+                $reason = 'Hi,<br/>This order information could not be copied over to Shopify due to the following reason :<br/>
+                            There was no shopify SKU information present for items in this order. Please update the SKU match table and reprocess it from the dashboard.';
+                $this->notifybyemail('Amazon Order', $reason);
                 $result = false;
             } else {
-                 $shopifyOrderId = ltrim($obj['order']['name'], '#');
+                $shopifyOrderId = ltrim($obj['order']['name'], '#');
                 $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'], "Updated", $shopifyOrderId);
                 $result = true;
             }
         } else {
+           
             $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'], "Not Updated");
-            $reason = 'No matching SKU found for the the Amozon Sku Code, Please Update Sku Table. Amzon Order Id is :-' . $orderDetails['AmazonOrderId'];
-            $this->notifybyemail('Travel Beauty Sku Mismatch', $reason);
+            $reason = 'Hi,</br><br/>This order information could not be copied over to Shopify due to the following reason :<br/>
+                            There was no shopify SKU information present for items in this order. Please update the SKU match table and reprocess it from the dashboard.';
+            $reason .= "<br/>Amazon seller SKU is/are ";
+            $skucount = count($saveSkuForEmail);
+            for ($r = 0; $r <= $skucount - 1; $r++) {
+                $reason .= $saveSkuForEmail[$r];
+                if ($r < ($skucount -1))
+                    $reason .= ",";
+            }
+           
+            $this->notifybyemail('Amazon Order', $reason);
             $result = false;
         }
         if (!empty($extra)) {
 
             if ($result) {
                 $this->session->set_flashdata('success', 'Order Created on Shopify Successfully');
-            } else { 
+            } else {
                 $this->session->set_flashdata('error', 'Error While Creating Shopify Order, Please Update SKU table and retry');
             }
-            redirect('admin/orders/'.$page);
+            redirect('admin/orders/' . $page);
         }
     }
 
@@ -364,7 +387,7 @@ class Amazonorders extends CI_Controller {
 
     public function createShopifyOrder() {
         $amazonId = $_GET['id'];
-         $page = $_GET['page'];
+        $page = $_GET['page'];
         $id = $this->obj->getOrderDetailsId($amazonId);
 
         $orderDetails = $this->obj->getAmazonJsonData($amazonId);
@@ -375,6 +398,7 @@ class Amazonorders extends CI_Controller {
             $order_details[$order_details['AmazonOrderId']] = $order_amazon_details;
         }
 
-        $this->shopifyAddOrders($order_details, $id, "redirect",$page);
+        $this->shopifyAddOrders($order_details, $id, "redirect", $page);
     }
+
 }
