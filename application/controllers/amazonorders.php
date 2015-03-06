@@ -241,6 +241,22 @@ class Amazonorders extends CI_Controller {
             curl_setopt($session, CURLOPT_HEADER, false);
             curl_setopt($session, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-Type: application/json'));
 
+            $sbaddress = '"first_name":"' . $firstName . '",
+                     "last_name":"' . $lastName . '",
+                    "address1": "' . $orderDetails['ShippingAddress']['AddressLine1'] . '",';
+
+            if(isset($orderDetails['ShippingAddress']['AddressLine2']))
+            {
+                $sbaddress .= '"address2": "' . $orderDetails['ShippingAddress']['AddressLine2'] . '",';             
+            }
+
+            $sbaddress .= '"phone": "' . $orderDetails['ShippingAddress']['Phone'] . '",
+                    "city": "' . $orderDetails['ShippingAddress']['City'] . '",
+                    "province":  "' . $orderDetails['ShippingAddress']['StateOrRegion'] . '",
+                    "country": "' . $country_code . '",
+                    "zip": "' . $orderDetails['ShippingAddress']['PostalCode'] . '"';
+
+
             curl_setopt($session, CURLOPT_POSTFIELDS, '{
                 "order": {
                   "line_items": ' . $data . ',
@@ -248,26 +264,8 @@ class Amazonorders extends CI_Controller {
                     "first_name": "Amazon",
                     "last_name":  "Order"
                     },
-                  "billing_address": {
-                    "first_name":"' . $firstName . '",
-                     "last_name":"' . $lastName . '",
-                    "address1": "' . $orderDetails['ShippingAddress']['AddressLine1'] . '",
-                    "phone": "' . $orderDetails['ShippingAddress']['Phone'] . '",
-                    "city": "' . $orderDetails['ShippingAddress']['City'] . '",
-                    "province":  "' . $orderDetails['ShippingAddress']['StateOrRegion'] . '",
-                    "country": "' . $country_code . '",
-                    "zip": "' . $orderDetails['ShippingAddress']['PostalCode'] . '"
-                  },
-                  "shipping_address": {
-                    "first_name":"' . $firstName . '",
-                       "last_name":"' . $lastName . '",    
-                    "address1": "' . $orderDetails['ShippingAddress']['AddressLine1'] . '",
-                    "phone": "' . $orderDetails['ShippingAddress']['Phone'] . '",
-                    "city": "' . $orderDetails['ShippingAddress']['City'] . '",
-                    "province":  "' . $orderDetails['ShippingAddress']['StateOrRegion'] . '",
-                    "country": "' . $country_code . '",
-                    "zip": "' . $orderDetails['ShippingAddress']['PostalCode'] . '"
-                  },
+                  "billing_address": {'. $sbaddress .'},
+                  "shipping_address": {'. $sbaddress .'},
                   "source_name" : "Amazon",
                    "email": "info@travelbeauty.com",
                    "transactions": [
@@ -339,6 +337,7 @@ class Amazonorders extends CI_Controller {
             $this->notifybyemail($subject, $reason);
             $result = false;
         }
+        $this->notifybyemail_new($orderDetails['AmazonOrderId']);
         if (!empty($extra)) {
 
             if ($result) {
@@ -348,6 +347,32 @@ class Amazonorders extends CI_Controller {
             }
             redirect('admin/orders/' . $page);
         }
+    }
+
+
+    public function nametest()
+    {
+        $sdf = "sdfa";
+        $abd =  '"address2": "' . (isset($sdf)) ? $sdf : "" . '"';
+        echo $abd;
+        return;
+        $name = explode(" ", "Michael L. Krass, Ph.D.");
+        $nameCount = count($name);
+
+
+        if ($nameCount > 1) {
+            $firstName = "";
+            for ($k = 0; $k < $nameCount - 1; $k++) {
+                $firstName .=$name[$k]." ";
+            }
+            end($name);
+            $lastName = $name[key($name)];
+        } else {
+            $firstName = $name[0];
+            $lastName = $firstName;
+        }
+        echo $firstName;
+        echo "<br/>".$lastName;
     }
 
     public function randomAlphaString($length = 7) {
@@ -379,6 +404,33 @@ class Amazonorders extends CI_Controller {
         $this->email->to($emaiTo);
          
         $this->email->cc('ankit@mobikasa.com');
+//        $this->email->bcc('them@their-example.com'); 
+
+        $this->email->subject($subject);
+        $this->email->message($reason);
+
+        $this->email->send();
+        return;
+    }
+
+    public function notifybyemail_new($subject, $reason = "") {
+
+        $config = Array(
+            'protocol' => 'smtp',
+            'smtp_host' => 'smtp.mandrillapp.com',
+            'smtp_port' => 587,
+            'smtp_user' => 'ankushmadaan@mobikasa.com',
+            'smtp_pass' => 'XJXm1e33BIZoj21utYNPgQ',
+            'mailtype' => 'html'
+        );
+        $this->load->library('email', $config);
+        //$this->email->set_newline("\r\n");
+        // Set to, from, message, etc.
+        $this->email->from('info@travelbeauty.com','Travel Beauty');
+        $emaiTo = array('ankitsnghn@gmail.com');
+        $this->email->to($emaiTo);
+         
+        //$this->email->cc('ankit@mobikasa.com');
 //        $this->email->bcc('them@their-example.com'); 
 
         $this->email->subject($subject);
