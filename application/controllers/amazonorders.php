@@ -450,7 +450,7 @@ $skuStatus =0;
         //$this->email->set_newline("\r\n");
         // Set to, from, message, etc.
         $this->email->from('info@travelbeauty.com','Travel Beauty');
-        $emaiTo = array('jaishankar@mobikasa.com');
+        $emaiTo = array('jaishankar@mobikasa.com','ankit@mobikasa.com');
         $this->email->to($emaiTo);
          
         //$this->email->cc('ankit@mobikasa.com');
