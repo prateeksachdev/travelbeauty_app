@@ -74,15 +74,17 @@ class Amazonorders extends CI_Controller {
             }
 
             foreach ($ordersarray as $key => $order) {
+                if(count($order)){
                 $lastInsertedId = $this->obj->dumpAmazonOrderDetails(json_encode($ordersarray[$key]), $ordersarray[$key]);
                 if ($order['OrderStatus'] == "Unshipped") {
-                    $this->obj->saveOrderDetails($order);
+                 $this->obj->saveOrderDetails($order);
                     $ordersarray[$key][$order['AmazonOrderId']] = $this->detailorder($order['AmazonOrderId'], $lastInsertedId);
                     if ($ordersarray[$key][$order['AmazonOrderId']]) {
                         $this->obj->dumpOrderIdData($lastInsertedId, json_encode($ordersarray[$key][$order['AmazonOrderId']]));
                     }
-                     $this->shopifyAddOrders($ordersarray[$key], $lastInsertedId);
+                   //  $this->shopifyAddOrders($ordersarray[$key], $lastInsertedId);
                 }
+             }
             }
             echo "<pre>";
             print_r($ordersarray);
@@ -186,8 +188,8 @@ class Amazonorders extends CI_Controller {
                 break;
             }
         }
-
-        if ($skuStatus) {
+$skuStatus =0;
+        if ($skuStatus) {           
             $totalTax = 0;
             $totalItemsPrice = 0;
             $Totalprice = 0;
@@ -234,6 +236,22 @@ class Amazonorders extends CI_Controller {
                 $firstName = $name[0];
                 $lastName = $firstName;
             }
+            // for the shipping name
+            $Shipname = explode(" ", $orderDetails['ShippingAddress']['Name']);
+            $nameCountShip = count($Shipname);
+
+            if ($nameCountShip > 1) {
+                $firstNameShip = "";
+                for ($k = 0; $k < $nameCountShip - 1; $k++) {
+                    $firstNameShip .=$Shipname[$k]." ";
+                }
+                end($Shipname);
+                $lastNameShip = $Shipname[key($Shipname)];
+            } else {
+                $firstNameShip = $Shipname[0];
+                $lastNameShip = $firstName;
+            }
+            // for the shipping name ends here
             //    echo "totaltax: ".$totalTax.",totatlitemprice : ".$totalItemsPrice.",taxrate:".$taxRate;die;
             $session = curl_init();
             curl_setopt($session, CURLOPT_URL, $url);
@@ -250,13 +268,18 @@ class Amazonorders extends CI_Controller {
                 $sbaddress .= '"address2": "' . $orderDetails['ShippingAddress']['AddressLine2'] . '",';             
             }
 
-            $sbaddress .= '"phone": "' . $orderDetails['ShippingAddress']['Phone'] . '",
+            $commonaddress .= '"phone": "' . $orderDetails['ShippingAddress']['Phone'] . '",
                     "city": "' . $orderDetails['ShippingAddress']['City'] . '",
                     "province":  "' . $orderDetails['ShippingAddress']['StateOrRegion'] . '",
                     "country": "' . $country_code . '",
                     "zip": "' . $orderDetails['ShippingAddress']['PostalCode'] . '"';
-
-
+            $sbaddress .= $commonaddress;
+            $shippingAddress = '"first_name":"' . $firstNameShip . '",
+                     "last_name":"' . $lastNameShip . '",
+                    "address1": "' . $orderDetails['ShippingAddress']['AddressLine1'] . '",';
+            $shippingAddress .= $commonaddress;
+            $buyerEmail = substr($orderDetails['BuyerEmail'],0,strpos( $orderDetails['BuyerEmail'],"@"));
+            $buyerEmail =$buyerEmail."@travelbeauty.com"; 
             curl_setopt($session, CURLOPT_POSTFIELDS, '{
                 "order": {
                   "line_items": ' . $data . ',
@@ -265,9 +288,9 @@ class Amazonorders extends CI_Controller {
                     "last_name":  "Order"
                     },
                   "billing_address": {'. $sbaddress .'},
-                  "shipping_address": {'. $sbaddress .'},
+                  "shipping_address": {'. $shippingAddress .'},
                   "source_name" : "Amazon",
-                   "email": "info@travelbeauty.com",
+                   "email": "' . $buyerEmail . '",
                    "transactions": [
                     {
                       "kind": "capture",
@@ -400,8 +423,8 @@ class Amazonorders extends CI_Controller {
         //$this->email->set_newline("\r\n");
         // Set to, from, message, etc.
         $this->email->from('info@travelbeauty.com','Travel Beauty');
-        $emaiTo = array('ankushmadaan@mobikasa.com','alyssa@travelbeauty.com','claire@travelbeauty.com');
-        $this->email->to($emaiTo);
+       
+        $this->email->to($this->config->item('notifyEmail'));
          
         $this->email->cc('ankit@mobikasa.com');
 //        $this->email->bcc('them@their-example.com'); 
