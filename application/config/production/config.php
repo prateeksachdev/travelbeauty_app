@@ -356,7 +356,7 @@ $config['rewrite_short_tags'] = FALSE;
 |
 */
 $config['proxy_ips'] = '';
-$config['notifyEmail'] = array('ankushmadaan@mobikasa.com','ankmobikasa@gmail.com','sukhmeet@mobikasa.com');
+$config['notifyEmail'] = array('ankushmadaan@mobikasa.com','ankmobikasa@gmail.com','sukhmeet@mobikasa.com','kishanraikwar@mobikasa.com','priyam@mobikasa.com');
 
 
 /* End of file config.php */
