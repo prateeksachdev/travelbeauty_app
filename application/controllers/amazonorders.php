@@ -188,7 +188,7 @@ class Amazonorders extends CI_Controller {
                 break;
             }
         }
-        $skuStatus =0;
+     
         if ($skuStatus) {           
             $totalTax = 0;
             $totalItemsPrice = 0;
