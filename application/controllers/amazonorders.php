@@ -332,7 +332,8 @@ class Amazonorders extends CI_Controller {
             $jsondata = str_replace("\r", "", $jsondata);
             $obj = json_decode($jsondata, true);
             $output['response'] = $jsondata;
-            print_r($obj);die;
+         
+            
             if (isset($obj['errors']) || isset($obj['error'])) {
 
                 $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'], "Not Updated");
