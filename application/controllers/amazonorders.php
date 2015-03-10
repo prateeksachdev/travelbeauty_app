@@ -414,7 +414,7 @@ class Amazonorders extends CI_Controller {
         $config = Array(
             'protocol' => 'smtp',
             'smtp_host' => 'smtp.gmail.com',
-            'smtp_port' => 465,
+            'smtp_port' => 587,
             'smtp_user' => 'mobikasatesters@gmail.com',
             'smtp_pass' => 'mobikasa',
             'mailtype' => 'html'
