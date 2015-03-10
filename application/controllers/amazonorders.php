@@ -221,7 +221,8 @@ class Amazonorders extends CI_Controller {
             } else {
                 $taxPercent = 0;
             }
-            $name = explode(" ", $orderDetails['BuyerName']);
+           
+            $name = explode(" ", trim($orderDetails['BuyerName']));
             $nameCount = count($name);
 
 
@@ -234,10 +235,10 @@ class Amazonorders extends CI_Controller {
                 $lastName = $name[key($name)];
             } else {
                 $firstName = $name[0];
-                $lastName = $firstName;
+                $lastName = $name[0];
             }
             // for the shipping name
-            $Shipname = explode(" ", $orderDetails['ShippingAddress']['Name']);
+            $Shipname = explode(" ", trim($orderDetails['ShippingAddress']['Name']));
             $nameCountShip = count($Shipname);
 
             if ($nameCountShip > 1) {
@@ -249,8 +250,9 @@ class Amazonorders extends CI_Controller {
                 $lastNameShip = $Shipname[key($Shipname)];
             } else {
                 $firstNameShip = $Shipname[0];
-                $lastNameShip = $firstName;
+                $lastNameShip = $$Shipname[0];
             }
+            
             // for the shipping name ends here
             //    echo "totaltax: ".$totalTax.",totatlitemprice : ".$totalItemsPrice.",taxrate:".$taxRate;die;
             $session = curl_init();
@@ -330,7 +332,7 @@ class Amazonorders extends CI_Controller {
             $jsondata = str_replace("\r", "", $jsondata);
             $obj = json_decode($jsondata, true);
             $output['response'] = $jsondata;
-
+            print_r($obj);die;
             if (isset($obj['errors']) || isset($obj['error'])) {
 
                 $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'], "Not Updated");
