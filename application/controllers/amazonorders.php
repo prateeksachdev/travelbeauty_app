@@ -413,10 +413,10 @@ class Amazonorders extends CI_Controller {
 
         $config = Array(
             'protocol' => 'smtp',
-            'smtp_host' => 'smtp.gmail.com',
+            'smtp_host' => 'smtp.mandrillapp.com',
             'smtp_port' => 587,
-            'smtp_user' => 'mobikasatesters@gmail.com',
-            'smtp_pass' => 'mobikasa',
+            'smtp_user' => 'ankit@mobikasa.com',
+            'smtp_pass' => '2fzmv1hLZA7Yj1MYR1mTHA',
             'mailtype' => 'html'
         );
         $this->load->library('email', $config);
@@ -433,8 +433,7 @@ class Amazonorders extends CI_Controller {
         $this->email->message($reason);
 
         $result = $this->email->send();
-        echo $this->email->print_debugger();
-        echo $result; die;
+       
         return;
     }
 

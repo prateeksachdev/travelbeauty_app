@@ -362,7 +362,7 @@ $config['proxy_ips'] = '';
 /* Location: ./application/config/config.php */
 /* End of file config.php */
 /* Location: ./application/config/config.php */
-$config['notifyEmail'] = array('ankushmadaan@mobikasa.com','ankmobikasa@gmail.com');
+$config['notifyEmail'] = array('ankushmadaan@mobikasa.com','ankmobikasa@gmail.com','sukhmeet@mobikasa.com','kishanraikwar@mobikasa.com','priyam@mobikasa.com');
 $config['base_url'] = "http://localhost/travelbeauty_app/";
 //$config['base_url'] = "http://app.travelbeauty.com/";
 
