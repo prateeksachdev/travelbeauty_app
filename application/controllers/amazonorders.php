@@ -433,6 +433,7 @@ class Amazonorders extends CI_Controller {
         $this->email->message($reason);
 
         $result = $this->email->send();
+        echo $this->email->print_debugger();
         echo $result; die;
         return;
     }
