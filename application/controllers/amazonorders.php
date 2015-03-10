@@ -74,7 +74,7 @@ class Amazonorders extends CI_Controller {
             }
 
             foreach ($ordersarray as $key => $order) {
-                if(count($ordersarray)){
+                if(count($ordersarray)){ 
                 $lastInsertedId = $this->obj->dumpAmazonOrderDetails(json_encode($ordersarray[$key]), $ordersarray[$key]);
                 if ($order['OrderStatus'] == "Unshipped") {
                  $this->obj->saveOrderDetails($order);
@@ -413,10 +413,10 @@ class Amazonorders extends CI_Controller {
 
         $config = Array(
             'protocol' => 'smtp',
-            'smtp_host' => 'smtp.mandrillapp.com',
-            'smtp_port' => 587,
-            'smtp_user' => 'ankushmadaan@mobikasa.com',
-            'smtp_pass' => 'XJXm1e33BIZoj21utYNPgQ',
+            'smtp_host' => 'smtp.gmail.com',
+            'smtp_port' => 465,
+            'smtp_user' => 'mobikasatesters@gmail.com',
+            'smtp_pass' => 'mobikasa',
             'mailtype' => 'html'
         );
         $this->load->library('email', $config);
@@ -432,7 +432,8 @@ class Amazonorders extends CI_Controller {
         $this->email->subject($subject);
         $this->email->message($reason);
 
-        $this->email->send();
+        $result = $this->email->send();
+        echo $result; die;
         return;
     }
 
