@@ -32,7 +32,7 @@
         {
           echo '<div class="alert alert-success">';
             echo '<a class="close" data-dismiss="alert">×</a>';
-            echo '<strong>Well done!</strong> product updated with success.';
+            echo '<strong>Well done!</strong> product updated  successfuly.';
           echo '</div>';       
         }else{
           echo '<div class="alert alert-error">';

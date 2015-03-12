@@ -31,6 +31,7 @@ class orders_model extends CI_Model {
        
         if($search_string){
             $this->db->like('order_id', $search_string);
+            $this->db->or_like('shopify_order_id', $search_string);
         }
 
         //$this->db->join('manufacturers', 'order_details.manufacture_id = manufacturers.id', 'left');
@@ -49,6 +50,7 @@ class orders_model extends CI_Model {
 
 
         $query = $this->db->get();
+//      echo  $sql = $this->db->last_query();die;
         return $query->result_array();  
     }
 

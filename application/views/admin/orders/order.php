@@ -58,9 +58,8 @@
 
             echo form_open('admin/orders', $attributes);
      
-              echo form_label('Search Amazon Order:', 'search_string');
-              echo form_input('search_string', $search_string_selected, 'style="width: 170px;
-height: 26px;"');
+              echo form_label('Search by Amazon/Shopify order: ', 'search_string');
+              echo form_input('search_string', $search_string_selected, 'style="width: 170px;height: 26px;margin: 5px;"');
 
              
               echo form_label('Order by:', 'order');

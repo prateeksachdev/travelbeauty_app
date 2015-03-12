@@ -48,6 +48,9 @@ class Products_model extends CI_Model {
 		
 		if($search_string){
 			$this->db->like('amazon_sku', $search_string);
+                        $this->db->or_like('shopify_sku', $search_string);
+                        $this->db->or_like('product_id', $search_string);
+                        $this->db->or_like('variant_id', $search_string);
 		}
 
 		
@@ -66,7 +69,7 @@ class Products_model extends CI_Model {
 
 
 		$query = $this->db->get();
-		
+//		echo  $sql = $this->db->last_query();die;
 		return $query->result_array(); 	
     }
 
@@ -105,9 +108,7 @@ class Products_model extends CI_Model {
 		$query = $this->db->get('amazon_sku_match');
 
         if($query->num_rows > 0){
-        	echo '<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a><strong>';
-			  echo "Amazon Sku Should be Unique";	
-			echo '</strong></div>';
+        	return false;
 		}else{
             $insert = $this->db->insert('amazon_sku_match', $data);
 		    return $insert;

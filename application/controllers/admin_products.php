@@ -21,7 +21,7 @@ class Admin_products extends CI_Controller {
     * @return void
     */
     public function index()
-    {
+    { 
 
         //all the posts sent by the view
         $manufacture_id = $this->input->post('manufacture_id');        
@@ -73,7 +73,7 @@ class Admin_products extends CI_Controller {
         //if any filter post was sent but we are in some page, we must load the session data
 
         //filtered && || paginated
-        if($manufacture_id !== false && $search_string !== false && $order !== false || $this->uri->segment(3) == true){ 
+        if( $search_string !== false && $order !== false || $this->uri->segment(3) == true){ 
            
             /*
             The comments here are the same for line 79 until 99
@@ -83,13 +83,7 @@ class Admin_products extends CI_Controller {
             we save order into the the var to load the view with the param already selected       
             */
 
-            if($manufacture_id !== 0){
-                $filter_session_data['manufacture_selected'] = $manufacture_id;
-            }else{
-                $manufacture_id = $this->session->userdata('manufacture_selected');
-            }
-            $data['manufacture_selected'] = $manufacture_id;
-
+           
             if($search_string){
                 $filter_session_data['search_string_selected'] = $search_string;
             }else{
@@ -169,7 +163,7 @@ class Admin_products extends CI_Controller {
             //form validation
             $this->form_validation->set_rules('amazon_sku', 'amazon_sku', 'required');
             $this->form_validation->set_rules('shopify_sku', 'shopify_sku', 'required');
-               $this->form_validation->set_rules('product_id', 'product_id', 'required');
+            $this->form_validation->set_rules('product_id', 'product_id', 'required');
             $this->form_validation->set_rules('variant_id', 'variant_id', 'required');
          
             $this->form_validation->set_error_delimiters('<div class="alert alert-error"><a class="close" data-dismiss="alert">×</a><strong>', '</strong></div>');
@@ -189,14 +183,15 @@ class Admin_products extends CI_Controller {
                     'product_id' => $this->input->post('product_id'),          
                     'variant_id' => $this->input->post('variant_id')
                 );
-			
-			if($this->products_model->store_product($data_to_store))
+			$result = $this->products_model->store_product($data_to_store);
+			if($result)
 			{
 				 $data['flash_message'] = TRUE; 		
 			}
 			else
 			{
-				 $data['flash_message'] = FALSE; 		
+				 $data['flash_message'] = FALSE; 
+                                 $data['error'] = "Amazon Sku Must be Unique";
 			}
 		   }
         }

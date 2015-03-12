@@ -36,7 +36,7 @@
                 $options_products = array('amazon_sku' => 'amazon_sku', 'shopify_sku' => 'shopify_sku');
                 echo form_open('admin/products', $attributes);
 
-                echo form_label('Search Amazon Sku:', 'search_string');
+                echo form_label('Search :', 'search_string');
                 echo form_input('search_string', $search_string_selected, 'style="width: 170px;height: 26px;"');
 
            
