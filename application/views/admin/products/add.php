@@ -34,13 +34,15 @@
             echo '<strong>Well done!</strong> new product created with success.';
           echo '</div>';       
         }else{
+         if(isset($error)){
           echo '<div class="alert alert-error">';
             echo '<a class="close" data-dismiss="alert">×</a>';
             
-           if(isset($error)){
+           
                echo $error;
+            echo '</div>'; 
            }
-          echo '</div>';          
+                  
         }
       }
       ?>
