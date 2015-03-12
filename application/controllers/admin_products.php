@@ -191,7 +191,7 @@ class Admin_products extends CI_Controller {
 			else
 			{
 				 $data['flash_message'] = FALSE; 
-                                 $data['error'] = "Amazon Sku,Shopify Sku and Variant Id Must be Unique";
+                                 $data['error'] = "Amazon Sku Must be Unique";
 			}
 		   }
         }

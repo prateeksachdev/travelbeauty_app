@@ -105,9 +105,7 @@ class Products_model extends CI_Model {
     function store_product($data)
     {
         $this->db->where('amazon_sku', $this->input->post('amazon_sku'));
-        $this->db->or_where('shopify_sku', $this->input->post('shopify_sku'));
-        $this->db->or_where('variant_id', $this->input->post('variant_id'));
-        
+     
 		$query = $this->db->get('amazon_sku_match');
 
         if($query->num_rows > 0){
