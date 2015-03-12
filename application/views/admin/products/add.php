@@ -37,7 +37,7 @@
           echo '<div class="alert alert-error">';
             echo '<a class="close" data-dismiss="alert">×</a>';
             
-           echo $error ;
+           echo isset($error) ? $error : "" ;
           echo '</div>';          
         }
       }

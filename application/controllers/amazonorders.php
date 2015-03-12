@@ -1,6 +1,5 @@
 <?php
 
-error_reporting(0);
 
 class Amazonorders extends CI_Controller {
 
