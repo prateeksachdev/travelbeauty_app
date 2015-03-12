@@ -20,7 +20,7 @@
       
       <div class="page-header">
         <h2>
-          Adding <?php echo ucfirst($this->uri->segment(2));?>
+          Add Sku
         </h2>
       </div>
  
@@ -38,7 +38,6 @@
           echo '<div class="alert alert-error">';
             echo '<a class="close" data-dismiss="alert">×</a>';
             
-           
                echo $error;
             echo '</div>'; 
            }
@@ -63,7 +62,7 @@
       ?>
         <fieldset>
           <div class="control-group">
-            <label for="inputError" class="control-label">amazon_sku</label>
+            <label for="inputError" class="control-label">Amazon Sku</label>
             <div class="controls">
               <input type="text" id="" name="amazon_sku" value="<?php echo set_value('amazon_sku'); ?>" >
               <!--<span class="help-inline">Woohoo!</span>-->
@@ -71,7 +70,7 @@
           </div>
              
           <div class="control-group">
-            <label for="inputError" class="control-label">shopify_sku</label>
+            <label for="inputError" class="control-label">Shopify Sku</label>
             <div class="controls">
               <input type="text" id="" name="shopify_sku" value="<?php echo set_value('shopify_sku'); ?>">
               <!--<span class="help-inline">Cost Price</span>-->
@@ -96,7 +95,7 @@
          
           <div class="form-actions">
             <button class="btn btn-primary" type="submit">Save changes</button>
-            <button class="btn" type="reset">Cancel</button>
+             <?php echo '<a href="' . site_url("admin") . '/products" class="btn">Cancel</a>'; ?> 
           </div>
         </fieldset>
 

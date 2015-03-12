@@ -39,7 +39,7 @@
                     </a>
                 </li>
                 <li>
-              <a href="<?php echo base_url(); ?>admin/products">Amazon SKU</a>
+              <a href="<?php echo base_url(); ?>admin/products">SKU Match Table</a>
             </li>
             <li>
               <a href="<?php echo base_url(); ?>admin/orders">Order List</a>
