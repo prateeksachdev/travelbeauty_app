@@ -388,7 +388,7 @@ class Amazonorders extends CI_Controller {
                             There was no shopify SKU information present for items in this order. Please update the SKU match table and reprocess it from the dashboard.';
             $reason .= "<br/>Amazon seller SKU is/are ";
             $skucount = count($saveSkuForEmail);
-            echo $skucount;die;
+            
             for ($r = 0; $r <= $skucount - 1; $r++) {
                 $reason .= $saveSkuForEmail[$r];
                 if ($r < ($skucount - 1))
