@@ -305,11 +305,14 @@ class Amazonorders extends CI_Controller {
                     "province":  "' . $orderDetails['ShippingAddress']['StateOrRegion'] . '",
                     "country": "' . $country_code . '",
                     "zip": "' . $orderDetails['ShippingAddress']['PostalCode'] . '"';
+                    
             $sbaddress .= $commonaddress;
             $shippingAddress = '"first_name":"' . $firstNameShip . '",
                      "last_name":"' . $lastNameShip . '",
                     "address1": "' . $orderDetails['ShippingAddress']['AddressLine1'] . '",';
+            if(isset($shipAddress2)){
             $shippingAddress .= $shipAddress2;
+            }
             $shippingAddress .= $commonaddress;
             $buyerEmail = substr($orderDetails['BuyerEmail'], 0, strpos($orderDetails['BuyerEmail'], "@"));
             $buyerEmail = $buyerEmail . "@travelbeauty.com";
