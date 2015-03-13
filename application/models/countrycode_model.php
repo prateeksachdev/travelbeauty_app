@@ -129,6 +129,11 @@ class countrycode_model extends CI_Model {
        
          return $id;
     }
+     public function getShippingMethod($amazonShipMethod) {
+         $query = $this->db->query("SELECT `shopify_shipping` FROM `shipping_match` where amazon_shipping = '".$amazonShipMethod."'");
+          $rowArray = $query->row_array();
+          return  $rowArray;
+    }
 }
 
 ?>

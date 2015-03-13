@@ -1,6 +1,5 @@
 <?php
 
-
 class Amazonorders extends CI_Controller {
 
 //    private $seller_id = $this->config->item('api_key');
@@ -66,24 +65,29 @@ class Amazonorders extends CI_Controller {
 
             $xml_array = unserialize(serialize(json_decode(json_encode((array) $xml), 1)));
             $orders = $xml_array['ListOrdersResult']['Orders']['Order'];
-            if (isset($orders[0])) {
-                $ordersarray = $orders;
-            } else {
-                $ordersarray[0] = $orders;
-            }
-
-            foreach ($ordersarray as $key => $order) {
-                if(count($ordersarray)){ 
-                $lastInsertedId = $this->obj->dumpAmazonOrderDetails(json_encode($ordersarray[$key]), $ordersarray[$key]);
-                if ($order['OrderStatus'] == "Unshipped") {
-                 $this->obj->saveOrderDetails($order);
-                    $ordersarray[$key][$order['AmazonOrderId']] = $this->detailorder($order['AmazonOrderId'], $lastInsertedId);
-                    if ($ordersarray[$key][$order['AmazonOrderId']]) {
-                        $this->obj->dumpOrderIdData($lastInsertedId, json_encode($ordersarray[$key][$order['AmazonOrderId']]));
-                    }
-                    $this->shopifyAddOrders($ordersarray[$key], $lastInsertedId);
+           
+            if ($orders) {
+                if (isset($orders[0])) {
+                    $ordersarray = $orders;
+                } else {
+                    $ordersarray[0] = $orders;
                 }
-             }
+
+
+                foreach ($ordersarray as $key => $order) {
+                    if (count($ordersarray)) {
+                        $lastInsertedId = $this->obj->dumpAmazonOrderDetails(json_encode($ordersarray[$key]), $ordersarray[$key]);
+                        if ($order['OrderStatus'] == "Unshipped") {
+                           $this->obj->saveOrderDetails($order);
+                            $ordersarray[$key][$order['AmazonOrderId']] = $this->detailorder($order['AmazonOrderId'], $lastInsertedId);
+                            if ($ordersarray[$key][$order['AmazonOrderId']]) {
+                                $this->obj->dumpOrderIdData($lastInsertedId, json_encode($ordersarray[$key][$order['AmazonOrderId']]));
+                            }
+                          
+                            $this->shopifyAddOrders($ordersarray[$key], $lastInsertedId);
+                        }
+                    }
+                }
             }
             echo "<pre>";
             print_r($ordersarray);
@@ -158,13 +162,13 @@ class Amazonorders extends CI_Controller {
             $sku = $xml_array['ListOrderItemsResult']['OrderItems']['OrderItem']['SellerSKU'];
             $this->obj->updateSkuInOrderDetails($id, $sku);
         }
+
         return $xml_array;
     }
 
     public function shopifyAddOrders($orderDetails, $lastInsertedId, $extra = "", $page = 1) {
 
-
-
+       
         if (!isset($orderDetails[$orderDetails['AmazonOrderId']]['ListOrderItemsResult']['OrderItems']['OrderItem']['OrderItemId'])) {
             $orderCustom = $orderDetails[$orderDetails['AmazonOrderId']]['ListOrderItemsResult']['OrderItems']['OrderItem'];
             $itemcount = count($orderCustom);
@@ -179,7 +183,7 @@ class Amazonorders extends CI_Controller {
         $url = 'https://' . $API_KEY . ':' . $SECRET . '@' . $STORE_URL . '/admin/orders.json';
         $email = "ankush" . $this->randomAlphaString(4) . "@mobikasa.com";
         $country_code = $this->obj->getCountryCode($orderDetails['ShippingAddress']['CountryCode']);
-
+//      print_r($orderCustom);die;
         for ($j = 0; $j < $itemcount; $j++) {
             $saveSkuForEmail[] = $orderCustom[$j]['SellerSKU'];
             $skuStatus = $this->obj->checkSkuCodeExist($orderCustom[$j]['SellerSKU']);
@@ -187,11 +191,14 @@ class Amazonorders extends CI_Controller {
                 break;
             }
         }
-     
-        if ($skuStatus) {           
+       
+
+        if ($skuStatus) {
             $totalTax = 0;
             $totalItemsPrice = 0;
             $Totalprice = 0;
+            $shippingPrice = 0;
+            $shippingTax = 0;
             $data = "[";
             for ($i = 0; $i < $itemcount; $i++) {
                 $shopify_prd_details = $this->obj->matchSkuCode($orderCustom[$i]['SellerSKU']);
@@ -199,7 +206,8 @@ class Amazonorders extends CI_Controller {
 
                 $totalTax = $totalTax + $orderCustom[$i]['ItemTax']['Amount'];
                 $totalItemsPrice = $totalItemsPrice + $orderCustom[$i]['ItemPrice']['Amount'];
-
+                $shippingPrice = $shippingPrice + $orderCustom[$i]['ShippingPrice']['Amount'];
+                $shippingTax = $shippingTax + $orderCustom[$i]['ShippingTax']['Amount'];
                 $data .= '{
                       "variant_id": "' . $shopify_prd_details['variant_id'] . '",
                       "title": "' . $orderCustom[$i]['Title'] . '",
@@ -214,13 +222,20 @@ class Amazonorders extends CI_Controller {
             }
             $data .= "]";
 
-            $Totalprice = $totalItemsPrice + $totalTax;
+            $Totalprice = $totalItemsPrice + $totalTax + $shippingPrice + $shippingTax;
+            $totalTax = $totalTax + $shippingTax;
             if ($totalTax > 0) {
                 $taxPercent = ($totalTax) / $totalItemsPrice;
             } else {
                 $taxPercent = 0;
             }
-           
+            
+            if($shippingTax >0){
+                 $shipTaxPercent = ($shippingTax) / $shippingPrice;
+            }else{
+                $shipTaxPercent = 0;
+            }
+
             $name = explode(" ", trim($orderDetails['BuyerName']));
             $nameCount = count($name);
 
@@ -228,7 +243,7 @@ class Amazonorders extends CI_Controller {
             if ($nameCount > 1) {
                 $firstName = "";
                 for ($k = 0; $k < $nameCount - 1; $k++) {
-                    $firstName .=$name[$k]." ";
+                    $firstName .=$name[$k] . " ";
                 }
                 end($name);
                 $lastName = $name[key($name)];
@@ -236,6 +251,7 @@ class Amazonorders extends CI_Controller {
                 $firstName = $name[0];
                 $lastName = $name[0];
             }
+          
             // for the shipping name
             $Shipname = explode(" ", trim($orderDetails['ShippingAddress']['Name']));
             $nameCountShip = count($Shipname);
@@ -243,16 +259,31 @@ class Amazonorders extends CI_Controller {
             if ($nameCountShip > 1) {
                 $firstNameShip = "";
                 for ($k = 0; $k < $nameCountShip - 1; $k++) {
-                    $firstNameShip .=$Shipname[$k]." ";
+                    $firstNameShip .=$Shipname[$k] . " ";
                 }
                 end($Shipname);
                 $lastNameShip = $Shipname[key($Shipname)];
             } else {
                 $firstNameShip = $Shipname[0];
-                $lastNameShip = $$Shipname[0];
+                $lastNameShip = $Shipname[0];
             }
-            
+
             // for the shipping name ends here
+            // shipping method and tax starts
+             $shipMethod = $orderDetails['ShipmentServiceLevelCategory'];
+             $shopifyShipMethod = $this->obj->getShippingMethod($shipMethod);
+             $shippingDetails = '"code":"' . $shopifyShipMethod['shopify_shipping'] . '",
+                     "price":"' . $shippingPrice . '",
+                     "title":"' . $shopifyShipMethod['shopify_shipping'] . '",
+                    "source": "Shopify", 
+                   "tax_lines": [
+                    {
+                      "price" : "' . $shippingTax . '", 
+                      "rate" : "' . $shipTaxPercent . '", 
+                      "title" : "Shipping Tax"
+                    }]';
+            // shipping method and tax ends here
+            
             //    echo "totaltax: ".$totalTax.",totatlitemprice : ".$totalItemsPrice.",taxrate:".$taxRate;die;
             $session = curl_init();
             curl_setopt($session, CURLOPT_URL, $url);
@@ -264,9 +295,8 @@ class Amazonorders extends CI_Controller {
                      "last_name":"' . $lastName . '",
                     "address1": "' . $orderDetails['ShippingAddress']['AddressLine1'] . '",';
 
-            if(isset($orderDetails['ShippingAddress']['AddressLine2']))
-            {
-                $sbaddress .= '"address2": "' . $orderDetails['ShippingAddress']['AddressLine2'] . '",';             
+            if (isset($orderDetails['ShippingAddress']['AddressLine2'])) {
+                $sbaddress .= '"address2": "' . $orderDetails['ShippingAddress']['AddressLine2'] . '",';
             }
 
             $commonaddress .= '"phone": "' . $orderDetails['ShippingAddress']['Phone'] . '",
@@ -279,8 +309,8 @@ class Amazonorders extends CI_Controller {
                      "last_name":"' . $lastNameShip . '",
                     "address1": "' . $orderDetails['ShippingAddress']['AddressLine1'] . '",';
             $shippingAddress .= $commonaddress;
-            $buyerEmail = substr($orderDetails['BuyerEmail'],0,strpos( $orderDetails['BuyerEmail'],"@"));
-            $buyerEmail =$buyerEmail."@travelbeauty.com"; 
+            $buyerEmail = substr($orderDetails['BuyerEmail'], 0, strpos($orderDetails['BuyerEmail'], "@"));
+            $buyerEmail = $buyerEmail . "@travelbeauty.com";
             curl_setopt($session, CURLOPT_POSTFIELDS, '{
                 "order": {
                   "line_items": ' . $data . ',
@@ -288,8 +318,9 @@ class Amazonorders extends CI_Controller {
                     "first_name": "Amazon",
                     "last_name":  "Order"
                     },
-                  "billing_address": {'. $sbaddress .'},
-                  "shipping_address": {'. $shippingAddress .'},
+                  "billing_address": {' . $sbaddress . '},
+                  "shipping_address": {' . $shippingAddress . '},
+                   "shipping_lines": [{' . $shippingDetails . '}],
                   "source_name" : "Amazon",
                    "email": "' . $buyerEmail . '",
                    "transactions": [
@@ -332,13 +363,12 @@ class Amazonorders extends CI_Controller {
             $obj = json_decode($jsondata, true);
             $output['response'] = $jsondata;
          
-            
             if (isset($obj['errors']) || isset($obj['error'])) {
 
                 $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'], "Not Updated");
                 $reason = 'Hi,<br/>This order information could not be copied over to Shopify due to the following reason :<br/>
                             There was no shopify SKU information present for items in this order. Please update the SKU match table and reprocess it from the dashboard.';
-                $subject = 'Amazon Order #'.$orderDetails['AmazonOrderId'].' could not be processed';
+                $subject = 'Amazon Order #' . $orderDetails['AmazonOrderId'] . ' could not be processed';
                 $this->notifybyemail($subject, $reason);
                 $result = false;
             } else {
@@ -347,22 +377,23 @@ class Amazonorders extends CI_Controller {
                 $result = true;
             }
         } else {
-           
+
             $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'], "Not Updated");
             $reason = 'Hi,</br><br/>This order information could not be copied over to Shopify due to the following reason :<br/>
                             There was no shopify SKU information present for items in this order. Please update the SKU match table and reprocess it from the dashboard.';
             $reason .= "<br/>Amazon seller SKU is/are ";
             $skucount = count($saveSkuForEmail);
+            echo $skucount;die;
             for ($r = 0; $r <= $skucount - 1; $r++) {
                 $reason .= $saveSkuForEmail[$r];
-                if ($r < ($skucount -1))
+                if ($r < ($skucount - 1))
                     $reason .= ",";
             }
-            $subject = 'Amazon Order #'.$orderDetails['AmazonOrderId'].' could not be processed';
+            $subject = 'Amazon Order #' . $orderDetails['AmazonOrderId'] . ' could not be processed';
             $this->notifybyemail($subject, $reason);
             $result = false;
         }
-        $this->notifybyemail_new($orderDetails['AmazonOrderId']);
+      
         if (!empty($extra)) {
 
             if ($result) {
@@ -372,13 +403,12 @@ class Amazonorders extends CI_Controller {
             }
             redirect('admin/orders/' . $page);
         }
+       
     }
 
-
-    public function nametest()
-    {
+    public function nametest() {
         $sdf = "sdfa";
-        $abd =  '"address2": "' . (isset($sdf)) ? $sdf : "" . '"';
+        $abd = '"address2": "' . (isset($sdf)) ? $sdf : "" . '"';
         echo $abd;
         return;
         $name = explode(" ", "Michael L. Krass, Ph.D.");
@@ -388,7 +418,7 @@ class Amazonorders extends CI_Controller {
         if ($nameCount > 1) {
             $firstName = "";
             for ($k = 0; $k < $nameCount - 1; $k++) {
-                $firstName .=$name[$k]." ";
+                $firstName .=$name[$k] . " ";
             }
             end($name);
             $lastName = $name[key($name)];
@@ -397,7 +427,7 @@ class Amazonorders extends CI_Controller {
             $lastName = $firstName;
         }
         echo $firstName;
-        echo "<br/>".$lastName;
+        echo "<br/>" . $lastName;
     }
 
     public function randomAlphaString($length = 7) {
@@ -424,10 +454,10 @@ class Amazonorders extends CI_Controller {
         $this->load->library('email', $config);
         //$this->email->set_newline("\r\n");
         // Set to, from, message, etc.
-        $this->email->from('info@travelbeauty.com','Travel Beauty');
-       
+        $this->email->from('info@travelbeauty.com', 'Travel Beauty');
+
         $this->email->to($this->config->item('notifyEmail'));
-         
+
         $this->email->cc('ankit@mobikasa.com');
 //        $this->email->bcc('them@their-example.com'); 
 
@@ -435,7 +465,7 @@ class Amazonorders extends CI_Controller {
         $this->email->message($reason);
 
         $result = $this->email->send();
-       
+
         return;
     }
 
@@ -452,10 +482,10 @@ class Amazonorders extends CI_Controller {
         $this->load->library('email', $config);
         //$this->email->set_newline("\r\n");
         // Set to, from, message, etc.
-        $this->email->from('info@travelbeauty.com','Travel Beauty');
-        $emaiTo = array('jaishankar@mobikasa.com','ankit@mobikasa.com');
+        $this->email->from('info@travelbeauty.com', 'Travel Beauty');
+        $emaiTo = array('jaishankar@mobikasa.com', 'ankit@mobikasa.com');
         $this->email->to($emaiTo);
-         
+
         //$this->email->cc('ankit@mobikasa.com');
 //        $this->email->bcc('them@their-example.com'); 
 
