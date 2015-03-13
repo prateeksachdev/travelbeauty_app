@@ -297,6 +297,7 @@ class Amazonorders extends CI_Controller {
 
             if (isset($orderDetails['ShippingAddress']['AddressLine2'])) {
                 $sbaddress .= '"address2": "' . $orderDetails['ShippingAddress']['AddressLine2'] . '",';
+                $shipAddress2 = '"address2": "' . $orderDetails['ShippingAddress']['AddressLine2'] . '",';
             }
 
             $commonaddress .= '"phone": "' . $orderDetails['ShippingAddress']['Phone'] . '",
@@ -308,6 +309,7 @@ class Amazonorders extends CI_Controller {
             $shippingAddress = '"first_name":"' . $firstNameShip . '",
                      "last_name":"' . $lastNameShip . '",
                     "address1": "' . $orderDetails['ShippingAddress']['AddressLine1'] . '",';
+            $shippingAddress .= $shipAddress2;
             $shippingAddress .= $commonaddress;
             $buyerEmail = substr($orderDetails['BuyerEmail'], 0, strpos($orderDetails['BuyerEmail'], "@"));
             $buyerEmail = $buyerEmail . "@travelbeauty.com";
