@@ -14,8 +14,8 @@ class Amazonorders extends CI_Controller {
 
     public function index() {
         try {
-
-            echo $date = $this->obj->getOrderDetails();
+            
+          echo  $date = $this->obj->getOrderDetails();
             $tostring = "$date";
             $date = strtotime($tostring) + 1;
             $mysql = date("Y-m-d H:i:s", $date);
@@ -29,7 +29,7 @@ class Amazonorders extends CI_Controller {
             $param['Timestamp'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time());
             $param['Version'] = '2011-01-01';
             $param['MarketplaceId.Id.1'] = $this->config->item('marketplace_id');
-            $param['CreatedAfter'] = date("Y-m-d\TH:i:s.\\0\\0\\0\\Z", $date);
+            $param['LastUpdatedAfter'] = date("Y-m-d\TH:i:s.\\0\\0\\0\\Z", $date);
             $timestamp = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z"); //"2010-10-05T18%3A12%3A31.687Z";
             $secret = $this->config->item('secret_key');
             $operation = "AWSECommerceService";
@@ -77,14 +77,19 @@ class Amazonorders extends CI_Controller {
                 foreach ($ordersarray as $key => $order) {
                     if (count($ordersarray)) {
                         $lastInsertedId = $this->obj->dumpAmazonOrderDetails(json_encode($ordersarray[$key]), $ordersarray[$key]);
-                        if ($order['OrderStatus'] == "Unshipped") {
-                           $this->obj->saveOrderDetails($order);
-                            $ordersarray[$key][$order['AmazonOrderId']] = $this->detailorder($order['AmazonOrderId'], $lastInsertedId);
-                            if ($ordersarray[$key][$order['AmazonOrderId']]) {
-                                $this->obj->dumpOrderIdData($lastInsertedId, json_encode($ordersarray[$key][$order['AmazonOrderId']]));
+                        $checkorder = $this->obj->checkIfOrderExists($order['AmazonOrderId']);
+                        if ($checkorder) {
+                            if ($order['OrderStatus'] == "Unshipped") {
+                                $this->obj->saveOrderDetails($order);
+                                $ordersarray[$key][$order['AmazonOrderId']] = $this->detailorder($order['AmazonOrderId'], $lastInsertedId);
+                                if ($ordersarray[$key][$order['AmazonOrderId']]) {
+                                    $this->obj->dumpOrderIdData($lastInsertedId, json_encode($ordersarray[$key][$order['AmazonOrderId']]));
+                                }
+
+                               $this->shopifyAddOrders($ordersarray[$key], $lastInsertedId);
                             }
-                          
-                            $this->shopifyAddOrders($ordersarray[$key], $lastInsertedId);
+                        }else{
+                           $this->obj->dumpRepeatOrderDetails(json_encode($ordersarray[$key]), $ordersarray[$key]);
                         }
                     }
                 }
@@ -168,7 +173,7 @@ class Amazonorders extends CI_Controller {
 
     public function shopifyAddOrders($orderDetails, $lastInsertedId, $extra = "", $page = 1) {
 
-       
+
         if (!isset($orderDetails[$orderDetails['AmazonOrderId']]['ListOrderItemsResult']['OrderItems']['OrderItem']['OrderItemId'])) {
             $orderCustom = $orderDetails[$orderDetails['AmazonOrderId']]['ListOrderItemsResult']['OrderItems']['OrderItem'];
             $itemcount = count($orderCustom);
@@ -191,7 +196,7 @@ class Amazonorders extends CI_Controller {
                 break;
             }
         }
-       
+
 
         if ($skuStatus) {
             $totalTax = 0;
@@ -229,10 +234,10 @@ class Amazonorders extends CI_Controller {
             } else {
                 $taxPercent = 0;
             }
-            
-            if($shippingTax >0){
-                 $shipTaxPercent = ($shippingTax) / $shippingPrice;
-            }else{
+
+            if ($shippingTax > 0) {
+                $shipTaxPercent = ($shippingTax) / $shippingPrice;
+            } else {
                 $shipTaxPercent = 0;
             }
 
@@ -251,7 +256,7 @@ class Amazonorders extends CI_Controller {
                 $firstName = $name[0];
                 $lastName = $name[0];
             }
-          
+
             // for the shipping name
             $Shipname = explode(" ", trim($orderDetails['ShippingAddress']['Name']));
             $nameCountShip = count($Shipname);
@@ -270,9 +275,9 @@ class Amazonorders extends CI_Controller {
 
             // for the shipping name ends here
             // shipping method and tax starts
-             $shipMethod = $orderDetails['ShipmentServiceLevelCategory'];
-             $shopifyShipMethod = $this->obj->getShippingMethod($shipMethod);
-             $shippingDetails = '"code":"' . $shopifyShipMethod['shopify_shipping'] . '",
+            $shipMethod = $orderDetails['ShipmentServiceLevelCategory'];
+            $shopifyShipMethod = $this->obj->getShippingMethod($shipMethod);
+            $shippingDetails = '"code":"' . $shopifyShipMethod['shopify_shipping'] . '",
                      "price":"' . $shippingPrice . '",
                      "title":"' . $shopifyShipMethod['shopify_shipping'] . '",
                     "source": "Shopify", 
@@ -283,7 +288,6 @@ class Amazonorders extends CI_Controller {
                       "title" : "Shipping Tax"
                     }]';
             // shipping method and tax ends here
-            
             //    echo "totaltax: ".$totalTax.",totatlitemprice : ".$totalItemsPrice.",taxrate:".$taxRate;die;
             $session = curl_init();
             curl_setopt($session, CURLOPT_URL, $url);
@@ -367,7 +371,7 @@ class Amazonorders extends CI_Controller {
             $jsondata = str_replace("\r", "", $jsondata);
             $obj = json_decode($jsondata, true);
             $output['response'] = $jsondata;
-         
+
             if (isset($obj['errors']) || isset($obj['error'])) {
 
                 $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'], "Not Updated");
@@ -398,7 +402,7 @@ class Amazonorders extends CI_Controller {
             $this->notifybyemail($subject, $reason);
             $result = false;
         }
-      
+
         if (!empty($extra)) {
 
             if ($result) {
@@ -408,7 +412,6 @@ class Amazonorders extends CI_Controller {
             }
             redirect('admin/orders/' . $page);
         }
-       
     }
 
     public function nametest() {
