@@ -456,7 +456,7 @@ class Amazonorders extends CI_Controller {
             'smtp_host' => 'smtp.mandrillapp.com',
             'smtp_port' => 587,
             'smtp_user' => 'ankit@mobikasa.com',
-            'smtp_pass' => '2fzmv1hLZA7Yj1MYR1mTHA',
+            'smtp_pass' => 'bWi0R4h3RFI6ai04toy_Zw',
             'mailtype' => 'html'
         );
         $this->load->library('email', $config);
