@@ -365,7 +365,7 @@ class Amazonorders extends CI_Controller {
             curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($session, CURLOPT_SSL_VERIFYPEER, false);
             $jsondata = curl_exec($session);
-         
+            print_r($jsondata);die;
             //  print_r(curl_getinfo($session));die;
             if ($jsondata) {
                 $this->obj->dumpShopifyOrderDetails($jsondata, $lastInsertedId);
