@@ -297,10 +297,15 @@ class Amazonorders extends CI_Controller {
             curl_setopt($session, CURLOPT_POST, 1);
             curl_setopt($session, CURLOPT_HEADER, false);
             curl_setopt($session, CURLOPT_HTTPHEADER, array('Accept: application/json', 'Content-Type: application/json'));
-
+             if(isset($orderDetails['ShippingAddress']['AddressLine1'])){ 
+                $address1 = $orderDetails['ShippingAddress']['AddressLine1'];
+               
+            }else{
+                 $address1 = $orderDetails['ShippingAddress']['AddressLine2'];
+            }
             $sbaddress = '"first_name":"' . $firstName . '",
                      "last_name":"' . $lastName . '",
-                    "address1": "' . $orderDetails['ShippingAddress']['AddressLine1'] . '",';
+                    "address1": "' . $address1 . '",';
 
             if (isset($orderDetails['ShippingAddress']['AddressLine2'])) {
                 $sbaddress .= '"address2": "' . $orderDetails['ShippingAddress']['AddressLine2'] . '",';
@@ -314,13 +319,7 @@ class Amazonorders extends CI_Controller {
                     "zip": "' . $orderDetails['ShippingAddress']['PostalCode'] . '"';
                     
             $sbaddress .= $commonaddress;
-            if(isset($orderDetails['ShippingAddress']['AddressLine1'])){ die("isser");
-                $address1 = $orderDetails['ShippingAddress']['AddressLine1'];
-               
-            }else{
-                 $address1 = $orderDetails['ShippingAddress']['AddressLine2'];
-            }
-            echo $address1;
+         
             $shippingAddress = '"first_name":"' . $firstNameShip . '",
                      "last_name":"' . $lastNameShip . '",
                     "address1": "' . $address1 . '",';
@@ -366,7 +365,7 @@ class Amazonorders extends CI_Controller {
             curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($session, CURLOPT_SSL_VERIFYPEER, false);
             $jsondata = curl_exec($session);
-            print_r($jsondata);die;
+          
             //  print_r(curl_getinfo($session));die;
             if ($jsondata) {
                 $this->obj->dumpShopifyOrderDetails($jsondata, $lastInsertedId);
