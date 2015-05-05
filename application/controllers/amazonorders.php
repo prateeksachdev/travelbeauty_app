@@ -316,7 +316,7 @@ class Amazonorders extends CI_Controller {
             $sbaddress .= $commonaddress;
             if(empty($orderDetails['ShippingAddress']['AddressLine1'])){
                 if($shipAddress2){
-                $address1 = $shipAddress2;
+                $address1 = $orderDetails['ShippingAddress']['AddressLine2'];
                 }else{
                      $address1 = "No Address Set";
                 }
