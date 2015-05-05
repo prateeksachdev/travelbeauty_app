@@ -314,14 +314,11 @@ class Amazonorders extends CI_Controller {
                     "zip": "' . $orderDetails['ShippingAddress']['PostalCode'] . '"';
                     
             $sbaddress .= $commonaddress;
-            if(empty($orderDetails['ShippingAddress']['AddressLine1'])){
-                if($shipAddress2){
-                $address1 = $orderDetails['ShippingAddress']['AddressLine2'];
-                }else{
-                     $address1 = "No Address Set";
-                }
+            if(isset($orderDetails['ShippingAddress']['AddressLine1'])){
+                $address1 = $orderDetails['ShippingAddress']['AddressLine1'];
+               
             }else{
-                 $address1 = $orderDetails['ShippingAddress']['AddressLine1'];
+                 $address1 = $orderDetails['ShippingAddress']['AddressLine2'];
             }
             $shippingAddress = '"first_name":"' . $firstNameShip . '",
                      "last_name":"' . $lastNameShip . '",
