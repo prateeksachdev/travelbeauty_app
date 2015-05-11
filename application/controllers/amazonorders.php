@@ -15,7 +15,7 @@ class Amazonorders extends CI_Controller {
     public function index() {
         try {
             
-          echo  $date = $this->obj->getOrderDetails();
+           $date = $this->obj->getOrderDetails();
             $tostring = "$date";
             $date = strtotime($tostring) + 1;
             $mysql = date("Y-m-d H:i:s", $date);
@@ -381,13 +381,18 @@ class Amazonorders extends CI_Controller {
             $obj = json_decode($jsondata, true);
             $output['response'] = $jsondata;
 
-            if (isset($obj['errors']) || isset($obj['error'])) {
+           if (isset($obj['errors']) || isset($obj['error'])) {
 
                 $this->obj->updateOrderDetails($orderDetails['AmazonOrderId'], "Not Updated");
                 $reason = 'Hi,<br/>This order information could not be copied over to Shopify due to the following reason :<br/>
                             There was no shopify SKU information present for items in this order. Please update the SKU match table and reprocess it from the dashboard.';
                 $subject = 'Amazon Order #' . $orderDetails['AmazonOrderId'] . ' could not be processed';
-                $this->notifybyemail($subject, $reason);
+                $emailStstus = $this->notifybyemail($subject, $reason);
+               
+                if($emailStstus){
+                $this->obj->emailStatus($orderDetails['AmazonOrderId']);
+                }
+               
                 $result = false;
             } else {
                 $shopifyOrderId = ltrim($obj['order']['name'], '#');
@@ -408,7 +413,10 @@ class Amazonorders extends CI_Controller {
                     $reason .= ",";
             }
             $subject = 'Amazon Order #' . $orderDetails['AmazonOrderId'] . ' could not be processed';
-            $this->notifybyemail($subject, $reason);
+            $emailStstus = $this->notifybyemail($subject, $reason);
+            if($emailStstus){
+            $this->obj->emailStatus($orderDetails['AmazonOrderId']);
+            }
             $result = false;
         }
 
@@ -483,7 +491,7 @@ class Amazonorders extends CI_Controller {
 
         $result = $this->email->send();
 
-        return;
+        return $result;
     }
 
     public function notifybyemail_new($subject, $reason = "") {
@@ -500,7 +508,7 @@ class Amazonorders extends CI_Controller {
         //$this->email->set_newline("\r\n");
         // Set to, from, message, etc.
         $this->email->from('info@travelbeauty.com', 'Travel Beauty');
-        $emaiTo = array('jaishankar@mobikasa.com', 'ankit@mobikasa.com');
+        $emaiTo = array('ankmobikasa@gmail.com', 'ankit@mobikasa.com');
         $this->email->to($emaiTo);
 
         //$this->email->cc('ankit@mobikasa.com');
@@ -509,8 +517,9 @@ class Amazonorders extends CI_Controller {
         $this->email->subject($subject);
         $this->email->message($reason);
 
-        $this->email->send();
-        return;
+        $email = $this->email->send();
+        
+        return $email;
     }
 
     public function createShopifyOrder() {
@@ -527,6 +536,20 @@ class Amazonorders extends CI_Controller {
         }
 
         $this->shopifyAddOrders($order_details, $id, "redirect", $page);
+    }
+    public function checkShopifyStatusByCronjob() { 
+        $order_id = $this->obj->orderStatusByCronjob();
+  
+        if(count($order_id)){
+            foreach ($order_id as $key => $value) { 
+                $reason = "Error in processing order";
+                $emailResponse = $this->notifybyemail_new("Travel Beauty Error,Email through Cron job for order id :".$value['order_id'],$reason);
+                if($emailResponse){
+                $this->obj->emailStatus($value['order_id']);
+                }
+            }
+        }
+        
     }
 
 }

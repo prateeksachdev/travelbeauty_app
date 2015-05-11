@@ -115,11 +115,21 @@ class countrycode_model extends CI_Model {
             $query = $this->db->query("update `order_details` set `shopify_update_status` ='" . $status . "',`shopify_order_id` ='" . $shopifyId . "' where order_id = '" . $amazonOrderId . "' ");
         }
     }
+    public function emailStatus($amazonOrderId) {
+        if ($amazonOrderId) {
+            $query = $this->db->query("update `order_details` set `email_status` = 1 where order_id = '" . $amazonOrderId . "' ");
+        }
+    }
 
     public function getOrderDetailsId($amazonId) {
         $query = $this->db->query("SELECT `id` FROM `order_details` where order_id = '" . $amazonId . "'");
         $rowArray = $query->row_array();
         return $rowArray['id'];
+    }
+    public function orderStatusByCronjob() {
+          $query = $this->db->query("SELECT `order_id` FROM `order_details` where amazon_order_status = 'Unshipped'  and shopify_order_id = 0 or  shopify_order_id is NULL and email_status =0");
+        $rowArray = $query->result_array();
+        return $rowArray;
     }
 
     public function getAmazonJsonData($amazonId) {
