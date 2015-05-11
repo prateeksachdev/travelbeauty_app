@@ -508,7 +508,7 @@ class Amazonorders extends CI_Controller {
         //$this->email->set_newline("\r\n");
         // Set to, from, message, etc.
         $this->email->from('info@travelbeauty.com', 'Travel Beauty');
-        $emaiTo = array('ankmobikasa@gmail.com', 'ankit@mobikasa.com');
+        $emaiTo = array('ankmobikasa@gmail.com');
         $this->email->to($emaiTo);
 
         //$this->email->cc('ankit@mobikasa.com');
