@@ -127,7 +127,7 @@ class countrycode_model extends CI_Model {
         return $rowArray['id'];
     }
     public function orderStatusByCronjob() {
-          $query = $this->db->query("SELECT `order_id` FROM `order_details` where amazon_order_status = 'Unshipped'  and shopify_order_id = 0 or  shopify_order_id is NULL and email_status = 0 or email_status is null");
+          $query = $this->db->query("SELECT `order_id` FROM `order_details` where amazon_order_status = 'Unshipped'  and (shopify_order_id = 0 or  shopify_order_id is NULL) and (email_status = 0 or email_status is null)");
         $rowArray = $query->result_array();
         return $rowArray;
     }
