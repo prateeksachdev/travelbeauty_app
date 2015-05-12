@@ -508,8 +508,8 @@ class Amazonorders extends CI_Controller {
         //$this->email->set_newline("\r\n");
         // Set to, from, message, etc.
         $this->email->from('info@travelbeauty.com', 'Travel Beauty');
-        $emaiTo = array('ankmobikasa@gmail.com');
-        $this->email->to($emaiTo);
+       // $emaiTo = array('ankmobikasa@gmail.com');
+        $this->email->to($this->config->item('notifyEmail'));
 
         //$this->email->cc('ankit@mobikasa.com');
 //        $this->email->bcc('them@their-example.com'); 
@@ -542,8 +542,8 @@ class Amazonorders extends CI_Controller {
   
         if(count($order_id)){
             foreach ($order_id as $key => $value) { 
-                $reason = "Error in processing order";
-                $emailResponse = $this->notifybyemail_new("Travel Beauty Error,Email through Cron job for order id :".$value['order_id'],$reason);
+                $reason = "An internal error occured while processing the order. This has not been copied over to Shopify";
+                $emailResponse = $this->notifybyemail_new("Could not process # :".$value['order_id'],$reason);
                 if($emailResponse){
                 $this->obj->emailStatus($value['order_id']);
                 }
