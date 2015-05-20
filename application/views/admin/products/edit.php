@@ -27,6 +27,7 @@
  
       <?php
       //flash messages
+     
       if($this->session->flashdata('flash_message')){
         if($this->session->flashdata('flash_message') == 'updated')
         {
@@ -37,7 +38,7 @@
         }else{
           echo '<div class="alert alert-error">';
             echo '<a class="close" data-dismiss="alert">×</a>';
-            echo '<strong>Oh snap!</strong> change a few things up and try submitting again.';
+            echo '<strong>Sku Details Not Found</strong>';
           echo '</div>';          
         }
       }
@@ -73,20 +74,7 @@
               <!--<span class="help-inline">Cost Price</span>-->
             </div>
           </div>
-          <div class="control-group">
-            <label for="inputError" class="control-label">Product id</label>
-            <div class="controls">
-              <input type="text" name="product_id" value="<?php echo $product[0]['product_id']; ?>">
-              <!--<span class="help-inline">OOps</span>-->
-            </div>
-          </div>
-             <div class="control-group">
-            <label for="inputError" class="control-label">Variant id</label>
-            <div class="controls">
-              <input type="text" name="variant_id" value="<?php echo $product[0]['variant_id']; ?>">
-              <!--<span class="help-inline">OOps</span>-->
-            </div>
-          </div>
+        
           
           <div class="form-actions">
             <button class="btn btn-primary" type="submit">Save changes</button>

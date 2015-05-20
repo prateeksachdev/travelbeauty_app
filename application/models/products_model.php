@@ -96,6 +96,17 @@ class Products_model extends CI_Model {
 		$query = $this->db->get();
 		return $query->num_rows();        
     }
+    public function getSkuDetails($sku) {
+        $this->db->select('*');
+	$this->db->from('shopify_sku_details');
+        $this->db->where('shopify_sku', $sku);
+        $query = $this->db->get();
+        if($query->num_rows() > 0){
+        return $query->row_array(); 	
+        }else{
+            return false;
+        }
+    }
 
     /**
     * Store the new item into the database

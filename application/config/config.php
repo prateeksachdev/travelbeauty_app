@@ -373,7 +373,12 @@ $config['access_key'] = "AKIAIZVO6ZPOMHLXN7UA";
 $config['secret_key'] = "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";
 
 // /* surprisepost  Access keys */
- $config['shopify_api_key'] = "d68564b222657cb012f2e8c19c91b38e";
- $config['shopify_secret_key'] = "97252c5d0a7178538c5abaae6f909ce7";
- $config['shopify_store_url'] = "surprisepost.myshopify.com";
+// $config['shopify_api_key'] = "d68564b222657cb012f2e8c19c91b38e";
+// $config['shopify_secret_key'] = "97252c5d0a7178538c5abaae6f909ce7";
+// $config['shopify_store_url'] = "surprisepost.myshopify.com";
+
+/* Shopify store key credentials  */
+$config['shopify_api_key'] = "82667d2ce9dd59c96226d9ead9d183ac";
+$config['shopify_secret_key'] = "1c4f2b81cba212f1943ea6aecbe52575";
+$config['shopify_store_url'] = "trbdev.myshopify.com";
 
