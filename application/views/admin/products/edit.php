@@ -27,7 +27,7 @@
  
       <?php
       //flash messages
-     
+   //  echo $this->session->flashdata('flash_message');
       if($this->session->flashdata('flash_message')){
         if($this->session->flashdata('flash_message') == 'updated')
         {

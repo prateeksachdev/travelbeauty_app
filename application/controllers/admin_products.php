@@ -240,7 +240,9 @@ class Admin_products extends CI_Controller {
                     $details = $this->products_model->getSkuDetails($this->input->post('shopify_sku'));
                    
                     if (!$details) { 
+                        
                        $this->session->set_flashdata('flash_message', 'not_updated');
+                       redirect('admin/products/update/' . $id . '');
                     }else{
                          $data_to_store = array(
                             'amazon_sku' => $this->input->post('amazon_sku'),
