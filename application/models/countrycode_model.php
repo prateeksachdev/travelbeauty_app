@@ -153,6 +153,11 @@ class countrycode_model extends CI_Model {
         $rowArray = $query->row_array();
         return $rowArray;
     }
+      public function getProvience($provience) {
+        $query = $this->db->query("SELECT  `provience` FROM `provience_match` where amazon_provience = '" . $provience . "'");
+        $rowArray = $query->row_array();
+        return $rowArray;
+    }
 
     public function checkIfOrderExists($orderid) {
         $checkquery = $this->db->query("SELECT Count(*) as count FROM `order_details` where order_id = '" . $orderid . "'");

@@ -311,7 +311,13 @@ class Amazonorders extends CI_Controller {
                 $sbaddress .= '"address2": "' . $orderDetails['ShippingAddress']['AddressLine2'] . '",';
                 $shipAddress2 = '"address2": "' . $orderDetails['ShippingAddress']['AddressLine2'] . '",';
             }
-
+            $provience =$this->obj->getProvience($orderDetails['ShippingAddress']['StateOrRegion']); 
+            if($provience){
+                $state = $provience['provience'];
+            }else{
+                 $state = $orderDetails['ShippingAddress']['StateOrRegion'];
+            }
+            print_r($state);die;
             $commonaddress .= '"phone": "' . $orderDetails['ShippingAddress']['Phone'] . '",
                     "city": "' . $orderDetails['ShippingAddress']['City'] . '",
                     "province":  "' . $orderDetails['ShippingAddress']['StateOrRegion'] . '",
