@@ -317,7 +317,7 @@ class Amazonorders extends CI_Controller {
             }else{
                  $state = $orderDetails['ShippingAddress']['StateOrRegion'];
             }
-            print_r($state);die;
+         
             $commonaddress .= '"phone": "' . $orderDetails['ShippingAddress']['Phone'] . '",
                     "city": "' . $orderDetails['ShippingAddress']['City'] . '",
                     "province":  "' . $orderDetails['ShippingAddress']['StateOrRegion'] . '",
