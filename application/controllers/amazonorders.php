@@ -320,7 +320,7 @@ class Amazonorders extends CI_Controller {
          
             $commonaddress .= '"phone": "' . $orderDetails['ShippingAddress']['Phone'] . '",
                     "city": "' . $orderDetails['ShippingAddress']['City'] . '",
-                    "province":  "' . $orderDetails['ShippingAddress']['StateOrRegion'] . '",
+                    "province":  "' . $state . '",
                     "country": "' . $country_code . '",
                     "zip": "' . $orderDetails['ShippingAddress']['PostalCode'] . '"';
                     
