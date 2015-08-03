@@ -309,7 +309,8 @@ class Admin_products extends CI_Controller {
         $countObj = $this->getcurldata("/admin/products/count.json");
         $count = $countObj['count'];
         $limit = 50;
-        $pages = round($count / $limit);
+        //$pages = round($count / $limit); comment by pankaj
+        $pages = ceil($count / $limit);
         //echo $pages;
         for ($i = 1; $i <= $pages; $i++) {
             //echo '/admin/products.json?published_status=published&fields=id,variants,vendor&limit='.$limit.'&page='.$i."<br>";
