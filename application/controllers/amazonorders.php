@@ -52,7 +52,8 @@ class Amazonorders extends CI_Controller {
 
             $link = "https://mws.amazonservices.com/Orders/2015-01-28?";
             $link .= $arr . "&Signature=" . $signature;
-
+echo $link;
+die;
             $ch = curl_init($link);
             curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/xml'));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
