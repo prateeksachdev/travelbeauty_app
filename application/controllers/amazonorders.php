@@ -29,8 +29,8 @@ class Amazonorders extends CI_Controller {
             $param['Timestamp'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time());
             $param['Version'] = '2011-01-01';
             $param['MarketplaceId.Id.1'] = $this->config->item('marketplace_id');
-           // $param['LastUpdatedAfter'] = date("Y-m-d\TH:i:s.\\0\\0\\0\\Z", $date);
-            $param['LastUpdatedAfter'] = "2016-02-01T18%3A12%3A31.687Z";
+           $param['LastUpdatedAfter'] = date("Y-m-d\TH:i:s.\\0\\0\\0\\Z", $date);
+           // $param['LastUpdatedAfter'] = "2016-02-01T18%3A12%3A31.687Z";
             $timestamp = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z"); //"2010-10-05T18%3A12%3A31.687Z";
             $secret = $this->config->item('secret_key');
             $operation = "AWSECommerceService";
@@ -44,17 +44,17 @@ class Amazonorders extends CI_Controller {
             sort($url);
             $arr = implode('&', $url);
             $sign = 'GET' . "\n";
-            $sign .= 'mws.amazonservices.ca' . "\n";
+            $sign .= 'mws.amazonservices.com' . "\n";
             $sign .= '/Orders/2015-01-28' . "\n";
             $sign .= $arr;
             $signature = hash_hmac("sha256", $sign, $secret, true);
             $signature = urlencode(base64_encode($signature));
             //  $signature = $this->createSignature($param['Signature'],$timestamp,$secret);
 
-            $link = "https://mws.amazonservices.ca/Orders/2015-01-28?";
+            $link = "https://mws.amazonservices.com/Orders/2015-01-28?";
             $link .= $arr . "&Signature=" . $signature;
-echo $link;
-die;
+//echo $link;
+//die;
             $ch = curl_init($link);
             curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/xml'));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
