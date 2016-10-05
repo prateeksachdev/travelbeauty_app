@@ -274,6 +274,9 @@ class Amazonorders extends CI_Controller {
                 $firstNameShip = $Shipname[0];
                 $lastNameShip = $Shipname[0];
             }
+            
+            $customerFirstname = empty($firstName)  ? $firstNameShip : $firstName  ;
+            $customerLastname =  empty($lastName)   ? $lastNameShip  : $lastName  ;
 
             // for the shipping name ends here
             // shipping method and tax starts
@@ -341,8 +344,8 @@ class Amazonorders extends CI_Controller {
                 "order": {
                   "line_items": ' . $data . ',
                    "customer": {
-                    "first_name": "Amazon",
-                    "last_name":  "Order"
+                    "first_name": "'.$customerFirstname.'",
+                    "last_name":  "'.$customerLastname.'"
                     },
                   "billing_address": {' . $sbaddress . '},
                   "shipping_address": {' . $shippingAddress . '},
