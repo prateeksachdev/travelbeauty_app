@@ -27,7 +27,7 @@ class Amazonorders extends CI_Controller {
             $param['SignatureMethod'] = 'HmacSHA256';
             $param['SignatureVersion'] = '2';
             $param['Timestamp'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time());
-            $param['Version'] = '2011-01-01';
+            $param['Version'] = '2013-09-01';
             $param['MarketplaceId.Id.1'] = $this->config->item('marketplace_id');
            $param['LastUpdatedAfter'] = date("Y-m-d\TH:i:s.\\0\\0\\0\\Z", $date);
            // $param['LastUpdatedAfter'] = "2016-02-01T18%3A12%3A31.687Z";
@@ -121,7 +121,7 @@ class Amazonorders extends CI_Controller {
         $param['SignatureMethod'] = 'HmacSHA256';
         $param['SignatureVersion'] = '2';
         $param['Timestamp'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time());
-        $param['Version'] = '2011-01-01';
+        $param['Version'] = '2013-09-01';
         $param['MarketplaceId.Id.1'] = $this->config->item('marketplace_id');
         $param['CreatedAfter'] = '2015-01-14';
         $param['CreatedBefore'] = '2015-01-15';
