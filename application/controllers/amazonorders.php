@@ -562,6 +562,63 @@ class Amazonorders extends CI_Controller {
         }
         
     }
+    
+    public function checkShopifyorderList() {		
+		    $date =  "2017-04-24 21:17:35"
+            $tostring = "$date";
+            $date = strtotime($tostring) + 1;
+            $mysql = date("Y-m-d H:i:s", $date);
+            $param = array();
+            $param['AWSAccessKeyId'] = $this->config->item('access_key');
+            $param['Action'] = 'ListOrders';
+            $param['SellerId'] = $this->config->item('seller_id');
+            //$param['Signature'] = 'ZQLpf8vEXAMPLE0iC265pf18n0%3D';
+            $param['SignatureMethod'] = 'HmacSHA256';
+            $param['SignatureVersion'] = '2';
+            $param['Timestamp'] = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z", time());
+            $param['Version'] = '2013-09-01';
+            $param['MarketplaceId.Id.1'] = $this->config->item('marketplace_id');
+           $param['LastUpdatedAfter'] = date("Y-m-d\TH:i:s.\\0\\0\\0\\Z", $date);
+           // $param['LastUpdatedAfter'] = "2016-02-01T18%3A12%3A31.687Z";
+            $timestamp = gmdate("Y-m-d\TH:i:s.\\0\\0\\0\\Z"); //"2010-10-05T18%3A12%3A31.687Z";
+            $secret = $this->config->item('secret_key');
+            $operation = "AWSECommerceService";
+            $url = array();
+            Ksort($param);
+            foreach ($param as $key => $val) {
+                $key = str_replace("%7E", "~", rawurlencode($key));
+                $val = str_replace("%7E", "~", rawurlencode($val));
+                $url[] = "{$key}={$val}";
+            }
+            sort($url);
+            $arr = implode('&', $url);
+            $sign = 'GET' . "\n";
+            $sign .= 'mws.amazonservices.com' . "\n";
+            $sign .= '/Orders/2015-01-28' . "\n";
+            $sign .= $arr;
+            $signature = hash_hmac("sha256", $sign, $secret, true);
+            $signature = urlencode(base64_encode($signature));
+            //  $signature = $this->createSignature($param['Signature'],$timestamp,$secret);
+
+            $link = "https://mws.amazonservices.com/Orders/2015-01-28?";
+            $link .= $arr . "&Signature=" . $signature;
+//echo $link;
+//die;
+            $ch = curl_init($link);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: application/xml'));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+            $response = curl_exec($ch);
+
+            $info = curl_getinfo($ch);
+            curl_close($ch);
+            $xml = simplexml_load_string($response);
+
+            $xml_array = unserialize(serialize(json_decode(json_encode((array) $xml), 1)));
+             echo "<pre>"; print_r($xml_array); exit;
+            $orders = $xml_array['ListOrdersResult']['Orders']['Order'];
+            echo "<pre>"; print_r($orders); exit;
+	}
   
 
 }
