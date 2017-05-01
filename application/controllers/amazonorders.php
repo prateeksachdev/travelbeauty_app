@@ -564,7 +564,7 @@ class Amazonorders extends CI_Controller {
     }
     
     public function checkShopifyorderList() {		
-		    $date =  "2017-04-24 21:17:35"
+		    $date =  "2017-04-24 21:17:35";
             $tostring = "$date";
             $date = strtotime($tostring) + 1;
             $mysql = date("Y-m-d H:i:s", $date);
