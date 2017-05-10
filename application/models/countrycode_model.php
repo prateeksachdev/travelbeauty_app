@@ -160,7 +160,7 @@ class countrycode_model extends CI_Model {
     }
 
     public function checkIfOrderExists($orderid) {
-        $checkquery = $this->db->query("SELECT Count(*) as count FROM `order_details` where order_id = '" . $orderid . "'");
+        $checkquery = $this->db->query("SELECT Count(*) as count FROM `orders_backup` where amazon_order_id = '" . $orderid . "'");
         $rowCount = $checkquery->row_array();
         if ($rowCount['count'] > 0) {
             return false;
