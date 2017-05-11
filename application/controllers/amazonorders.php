@@ -246,7 +246,6 @@ class Amazonorders extends CI_Controller {
             $name = explode(" ", trim($orderDetails['BuyerName']));
             $nameCount = count($name);
 
-
             if ($nameCount > 1) {
                 $firstName = "";
                 for ($k = 0; $k < $nameCount - 1; $k++) {
