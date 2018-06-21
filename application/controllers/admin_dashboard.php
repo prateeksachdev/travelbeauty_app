@@ -1,6 +1,5 @@
 <?php
 class Admin_dashboard extends CI_Controller {
- 
     /**
     * Responsable for auto load the model
     * @return void
@@ -10,7 +9,6 @@ class Admin_dashboard extends CI_Controller {
         parent::__construct();
         $this->load->model('order_details');
         $this->load->model('manufacturers_model');
-
         if(!$this->session->userdata('is_logged_in')){
             redirect('admin/login');
         }

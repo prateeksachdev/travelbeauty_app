@@ -8,8 +8,7 @@ class Admin_orders extends CI_Controller {
     public function __construct()
     {
         parent::__construct();
-        $this->load->model('orders_model');
-        
+        $this->load->model('orders_model');        
         if(!$this->session->userdata('is_logged_in')){
             redirect('admin/login');
         }
@@ -26,7 +25,6 @@ class Admin_orders extends CI_Controller {
         $search_string = $this->input->post('search_string');        
         $order = $this->input->post('order'); 
         $order_type = $this->input->post('order_type'); 
-
         //pagination settings
         $config['per_page'] = 25;
         $config['base_url'] = base_url().'admin/orders';
